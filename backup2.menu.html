@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChAIf SES - Menus</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+    <header>
+        <div class="logo">ChAIf SES</div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="stock.html">Inventaire</a></li>
+                <li><a href="menu.html" class="active">Menus</a></li>
+                <li><a href="planning.html">Planning</a></li>
+                <li><a href="suppliers.html">Fournisseurs</a></li>
+                <li><a href="settings.html">Paramètres</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <h1>Gestion des Menus</h1>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="menu-list">Catalogue de Menus</div>
+            <div class="tab" data-tab="menu-create">Créer un Menu</div>
+            <div class="tab" data-tab="menu-categories">Catégories</div>
+        </div>
+        
+        <!-- Tab 1: Liste des menus -->
+        <div id="menu-list-tab" class="tab-content active">
+            <div class="card">
+                <h2>Catalogue des Menus</h2>
+                <div class="filter-bar">
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="menu-search" placeholder="Rechercher un menu...">
+                    </div>
+                    <div class="filter-group">
+                        <select id="menu-filter-category">
+                            <option value="all">Toutes les catégories</option>
+                            <option value="entree">Entrées</option>
+                            <option value="plat">Plats principaux</option>
+                            <option value="dessert">Desserts</option>
+                            <option value="boisson">Boissons</option>
+                        </select>
+                        <select id="menu-filter-sort">
+                            <option value="name-asc">Nom (A-Z)</option>
+                            <option value="name-desc">Nom (Z-A)</option>
+                            <option value="price-asc">Prix (croissant)</option>
+                            <option value="price-desc">Prix (décroissant)</option>
+                            <option value="popular">Popularité</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="menu-grid">
+                    <!-- Menu 1 -->
+                    <div class="menu-card">
+                        <img src="/api/placeholder/320/180" alt="Risotto aux Champignons" class="menu-image">
+                        <div class="menu-card-content">
+                            <h3 class="menu-card-title">Risotto aux Champignons</h3>
+                            <div class="menu-card-meta">
+                                <span>💶 12,50€</span>
+                                <span>⭐ 4.8/5</span>
+                                <span>🍽️ Plat principal</span>
+                            </div>
+                            <p class="menu-card-description">Un risotto crémeux aux champignons, parfait pour un déjeuner élégant.</p>
+                            <div class="menu-card-actions">
+                                <button class="btn-primary">Détails</button>
+                                <button class="btn-success">Ajouter au planning</button>
+                            </div>
+                            <div class="menu-card-tags">
+                                <span class="menu-tag">Végétarien</span>
+                                <span class="menu-tag">Sans gluten</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Menu 2 -->
+                    <div class="menu-card">
+                        <img src="/api/placeholder/320/180" alt="Poulet Rôti aux Herbes" class="menu-image">
+                        <div class="menu-card-content">
+                            <h3 class="menu-card-title">Poulet Rôti aux Herbes</h3>
+                            <div class="menu-card-meta">
+                                <span>💶 14,90€</span>
+                                <span>⭐ 4.6/5</span>
+                                <span>🍽️ Plat principal</span>
+                            </div>
+                            <p class="menu-card-description">Un poulet rôti classique avec des herbes fraîches et des pommes de terre.</p>
+                            <div class="menu-card-actions">
+                                <button class="btn-primary">Détails</button>
+                                <button class="btn-success">Ajouter au planning</button>
+                            </div>
+                            <div class="menu-card-tags">
+                                <span class="menu-tag">Sans lactose</span>
+                                <span class="menu-tag">Populaire</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Menu 3 -->
+                    <div class="menu-card">
+                        <img src="/api/placeholder/320/180" alt="Salade Niçoise" class="menu-image">
+                        <div class="menu-card-content">
+                            <h3 class="menu-card-title">Salade Niçoise</h3>
+                            <div class="menu-card-meta">
+                                <span>💶 9,90€</span>
+                                <span>⭐ 4.5/5</span>
+                                <span>🍽️ Entrée/Plat</span>
+                            </div>
+                            <p class="menu-card-description">Une salade niçoise traditionnelle avec du thon, des œufs et des olives.</p>
+                            <div class="menu-card-actions">
+                                <button class="btn-primary">Détails</button>
+                                <button class="btn-success">Ajouter au planning</button>
+                            </div>
+                            <div class="menu-card-tags">
+                                <span class="menu-tag">Sans gluten</span>
+                                <span class="menu-tag">Estival</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Menu 4 -->
+                    <div class="menu-card">
+                        <img src="/api/placeholder/320/180" alt="Spaghetti Carbonara" class="menu-image">
+                        <div class="menu-card-content">
+                            <h3 class="menu-card-title">Spaghetti Carbonara</h3>
+                            <div class="menu-card-meta">
+                                <span>💶 11,50€</span>
+                                <span>⭐ 4.7/5</span>
+                                <span>🍽️ Plat principal</span>
+                            </div>
+                            <p class="menu-card-description">Des pâtes carbonara crémeuses avec du lard et du parmesan.</p>
+                            <div class="menu-card-actions">
+                                <button class="btn-primary">Détails</button>
+                                <button class="btn-success">Ajouter au planning</button>
+                            </div>
+                            <div class="menu-card-tags">
+                                <span class="menu-tag">Populaire</span>
+                                <span class="menu-tag">Italien</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="pagination">
+                    <div class="page-btn">«</div>
+                    <div class="page-btn active">1</div>
+                    <div class="page-btn">2</div>
+                    <div class="page-btn">3</div>
+                    <div class="page-btn">»</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab 2: Création de menu -->
+        <div id="menu-create-tab" class="tab-content">
+            <div class="card">
+                <h2>Créer un Nouveau Menu</h2>
+                <form id="menu-create-form">
+                    <div class="form-group">
+                        <label for="menu-name">Nom du menu</label>
+                        <input type="text" id="menu-name" name="menu-name" placeholder="Nom du menu" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="menu-category">Catégorie</label>
+                        <select id="menu-category" name="menu-category" required>
+                            <option value="">Sélectionner une catégorie</option>
+                            <option value="entree">Entrée</option>
+                            <option value="plat">Plat principal</option>
+                            <option value="dessert">Dessert</option>
+                            <option value="boisson">Boisson</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="menu-price">Prix (€)</label>
+                        <input type="number" id="menu-price" name="menu-price" min="0" step="0.01" placeholder="Prix" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="menu-description">Description</label>
+                        <textarea id="menu-description" name="menu-description" rows="4" placeholder="Description du menu" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="menu-ingredients">Ingrédients</label>
+                        <textarea id="menu-ingredients" name="menu-ingredients" rows="4" placeholder="Liste des ingrédients (un par ligne)" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="menu-tags">Tags (séparés par des virgules)</label>
+                        <input type="text" id="menu-tags" name="menu-tags" placeholder="ex: Végétarien, Sans gluten, Estival">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="menu-image">Image</label>
+                        <input type="file" id="menu-image" name="menu-image" accept="image/*">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn-success">Créer le menu</button>
+                        <button type="reset" class="btn-primary">Réinitialiser</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Tab 3: Catégories -->
+        <div id="menu-categories-tab" class="tab-content">
+            <div class="card">
+                <h2>Gestion des Catégories</h2>
+                <div class="filter-bar">
+                    <button id="add-category-btn" class="btn-success">Ajouter une Catégorie</button>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Description</th>
+                            <th>Nombre de menus</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Entrées</td>
+                            <td>Plats servis en début de repas</td>
+                            <td>15</td>
+                            <td>
+                                <button class="btn-primary">Modifier</button>
+                                <button class="btn-danger">Supprimer</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Plats principaux</td>
+                            <td>Plats servis comme plat principal</td>
+                            <td>28</td>
+                            <td>
+                                <button class="btn-primary">Modifier</button>
+                                <button class="btn-danger">Supprimer</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Desserts</td>
+                            <td>Plats sucrés servis en fin de repas</td>
+                            <td>12</td>
+                            <td>
+                                <button class="btn-primary">Modifier</button>
+                                <button class="btn-danger">Supprimer</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Boissons</td>
+                            <td>Boissons servies pendant le repas</td>
+                            <td>8</td>
+                            <td>
+                                <button class="btn-primary">Modifier</button>
+                                <button class="btn-danger">Supprimer</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/init.js"></script>
+    <script type="module" src="js/menu.js"></script>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChAIf SES - Connexion</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #e67e22;
+            --accent: #27ae60;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --success: #2ecc71;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: var(--dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .login-header h1 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .login-header hr {
+            border: none;
+            height: 2px;
+            background-color: var(--secondary);
+            margin: 0.5rem auto;
+            width: 50%;
+        }
+        
+        .login-form .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .login-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .login-form input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        
+        .login-form input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 2px rgba(230, 126, 34, 0.2);
+        }
+        
+        .login-button {
+            display: block;
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 1rem;
+        }
+        
+        .login-button:hover {
+            background-color: #d35400;
+        }
+        
+        .registration-link {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+        
+        .registration-link a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .registration-link a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Animation d'entrée */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .login-container {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .toast {
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: toast-in 0.3s forwards;
+        }
+        
+        .toast-success {
+            background-color: #d4edda;
+            border-left: 4px solid var(--success);
+            color: #155724;
+        }
+        
+        .toast-error {
+            background-color: #f8d7da;
+            border-left: 4px solid var(--danger);
+            color: #721c24;
+        }
+        
+        .toast-icon {
+            margin-right: 0.75rem;
+        }
+        
+        @keyframes toast-in {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Logo */
+        .logo {
+            max-width: 150px;
+            margin: 0 auto 1rem;
+            display: block;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 480px) {
+            .login-container {
+                max-width: 90%;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>Connexion ChAIf SES</h1>
+            <hr>
+        </div>
+        
+        <form class="login-form" id="login-form">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="votre@email.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="password" placeholder="Votre mot de passe" required>
+            </div>
+            
+            <button type="submit" class="login-button">Se connecter</button>
+        </form>
+        
+        <div class="registration-link">
+            <p>Pas encore de compte ? <a href="register.html">S'inscrire</a></p>
+        </div>
+    </div>
+    
+    <!-- Toast container -->
+    <div id="toast-container" class="toast-container"></div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('login-form');
+            
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                // Pour le développement, accepter n'importe quelle combinaison
+                // Pour un système réel, vérifiez email et mot de passe
+                if (email && password) {
+                    // Simuler l'authentification
+                    localStorage.setItem('chaif-ses-authenticated', 'true');
+                    localStorage.setItem('chaif-ses-user-email', email);
+                    
+                    // Afficher un message de succès
+                    showToast('Connexion réussie. Redirection...', 'success');
+                    
+                    // Rediriger vers la page principale après un court délai
+                    setTimeout(function() {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } else {
+                    showToast('Veuillez remplir tous les champs', 'error');
+                }
+            });
+            
+            // Fonction pour afficher un toast
+            function showToast(message, type = 'success') {
+                const container = document.getElementById('toast-container');
+                
+                const toast = document.createElement('div');
+                toast.className = `toast toast-${type}`;
+                
+                toast.innerHTML = `
+                    <div class="toast-icon">${type === 'success' ? '✅' : '❌'}</div>
+                    <div class="toast-message">${message}</div>
+                `;
+                
+                container.appendChild(toast);
+                
+                // Auto-destruction après 3 secondes
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateY(20px)';
+                    
+                    setTimeout(() => {
+                        if (toast.parentNode) {
+                            container.removeChild(toast);
+                        }
+                    }, 300);
+                }, 3000);
+            }
+            
+            // Vérifier si l'utilisateur est déjà connecté
+            const isAuthenticated = localStorage.getItem('chaif-ses-authenticated') === 'true';
+            if (isAuthenticated) {
+                // Rediriger vers la page principale
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>

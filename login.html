@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChAIf SES - Connexion</title>
+    <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>Connexion ChAIf SES</h1>
+            <hr>
+        </div>
+        
+        <form class="login-form" id="login-form">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="votre@email.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="password" placeholder="Votre mot de passe" required>
+            </div>
+            
+            <button type="submit" class="login-button">Se connecter</button>
+        </form>
+        
+        <div class="registration-link">
+            <p>Pas encore de compte ? <a href="register.html">S'inscrire</a></p>
+        </div>
+    </div>
+    
+    <!-- Toast container -->
+    <div id="toast-container" class="toast-container"></div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('login-form');
+            
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                // Pour le développement, accepter n'importe quelle combinaison
+                // Pour un système réel, vérifiez email et mot de passe
+                if (email && password) {
+                    // Simuler l'authentification
+                    localStorage.setItem('chaif-ses-authenticated', 'true');
+                    localStorage.setItem('chaif-ses-user-email', email);
+                    
+                    // Afficher un message de succès
+                    showToast('Connexion réussie. Redirection...', 'success');
+                    
+                    // Rediriger vers la page principale après un court délai
+                    setTimeout(function() {
+                        window.location.href = 'accueil.html';
+                    }, 1000);
+                } else {
+                    showToast('Veuillez remplir tous les champs', 'error');
+                }
+            });
+            
+            // Fonction pour afficher un toast
+            function showToast(message, type = 'success') {
+                const container = document.getElementById('toast-container');
+                
+                const toast = document.createElement('div');
+                toast.className = `toast toast-${type}`;
+                
+                toast.innerHTML = `
+                    <div class="toast-icon">${type === 'success' ? '✅' : '❌'}</div>
+                    <div class="toast-message">${message}</div>
+                `;
+                
+                container.appendChild(toast);
+                
+                // Auto-destruction après 3 secondes
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateY(20px)';
+                    
+                    setTimeout(() => {
+                        if (toast.parentNode) {
+                            container.removeChild(toast);
+                        }
+                    }, 300);
+                }, 3000);
+            }
+            
+            // Vérifier si l'utilisateur est déjà connecté
+            const isAuthenticated = localStorage.getItem('chaif-ses-authenticated') === 'true';
+            if (isAuthenticated) {
+                // Rediriger vers la page principale
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>

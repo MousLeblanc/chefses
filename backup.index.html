@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChAIf SES - Tableau de bord</title>
+    <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="logo">ChAIf SES</div>
+        <nav>
+            <ul>
+                <li><a href="index.html" class="active">Accueil</a></li>
+                <li><a href="stock.html">Inventaire</a></li>
+                <li><a href="menu.html">Menus</a></li>
+                <li><a href="planning.html">Planning</a></li>
+                <li><a href="suppliers.html">Fournisseurs</a></li>
+                <li><a href="settings.html">Paramètres</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <h1>Tableau de bord</h1>
+        
+        <div class="card">
+            <h2>Résumé du Stock</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-ingredients">127</div>
+                    <div class="stat-label">Ingrédients</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="low-stock-count">12</div>
+                    <div class="stat-label">Stock bas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="expiring-soon-count">3</div>
+                    <div class="stat-label">Bientôt périmés</div>
+                </div>
+            </div>
+            <a href="stock.html" class="btn-primary">Gérer le stock</a>
+        </div>
+        
+        <div class="card">
+            <h2>Planning des Menus</h2>
+            <div id="upcoming-menus">
+                <ul class="menu-preview-list">
+                    <li class="menu-preview-item">
+                        <span class="menu-preview-date">Aujourd'hui</span>
+                        <span class="menu-preview-name">Risotto aux Champignons</span>
+                        <span class="menu-preview-guests">50 couverts</span>
+                    </li>
+                    <li class="menu-preview-item">
+                        <span class="menu-preview-date">Demain</span>
+                        <span class="menu-preview-name">Salade Niçoise</span>
+                        <span class="menu-preview-guests">40 couverts</span>
+                    </li>
+                    <li class="menu-preview-item">
+                        <span class="menu-preview-date">20 Mai</span>
+                        <span class="menu-preview-name">Buddha Bowl Végétarien</span>
+                        <span class="menu-preview-guests">35 couverts</span>
+                    </li>
+                </ul>
+            </div>
+            <a href="planning.html" class="btn-primary">Voir le planning</a>
+        </div>
+        
+        <div class="card">
+            <h2>Alertes</h2>
+            <div id="alerts-container">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>Vérifiez les ingrédients bientôt périmés</span>
+                </div>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Planifiez vos menus pour la semaine prochaine</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Fournisseurs</h2>
+            <div id="supplier-stats">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-suppliers">8</div>
+                        <div class="stat-label">Fournisseurs</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="pending-orders">3</div>
+                        <div class="stat-label">Commandes en cours</div>
+                    </div>
+                </div>
+            </div>
+            <a href="suppliers.html" class="btn-primary">Gérer les fournisseurs</a>
+        </div>
+        
+        <!-- Section des raccourcis rapides -->
+        <div class="quick-actions">
+            <h2>Actions rapides</h2>
+            <div class="action-buttons">
+                <a href="stock.html#add" class="btn-primary">Ajouter un ingrédient</a>
+                <a href="planning.html#create" class="btn-primary">Créer un menu</a>
+                <a href="suppliers.html#order" class="btn-primary">Passer une commande</a>
+                <a href="stock.html#export" class="btn-primary">Exporter l'inventaire</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="img/logo.png" alt="ChAIf SES" id="footer-logo-placeholder" class="footer-logo-img" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22><text y=%2230%22 font-size=%2230%22>👨‍🍳</text></svg>';">
+                    <span>ChAIf SES</span>
+                </div>
+                
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h3>Liens rapides</h3>
+                        <ul>
+                            <li><a href="index.html">Accueil</a></li>
+                            <li><a href="stock.html">Gestion de stock</a></li>
+                            <li><a href="planning.html">Planning des menus</a></li>
+                            <li><a href="suppliers.html">Fournisseurs</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>© 2025 ChAIf SES. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script d'authentification -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Protection contre les boucles de redirection
+        const redirectCount = parseInt(localStorage.getItem('redirect-count') || '0');
+        if (redirectCount > 5) {
+            console.error("Trop de redirections détectées. Arrêt.");
+            return;
+        }
+        localStorage.setItem('redirect-count', redirectCount + 1);
+
+        const isAuth = localStorage.getItem('chaif-ses-authenticated') === 'true';
+        const urlParams = new URLSearchParams(window.location.search);
+        const isFromLogin = urlParams.get('redirect') === 'manual' || urlParams.get('logout') === 'true';
+
+        if (!isAuth && !isFromLogin) {
+            console.log("Utilisateur non authentifié, redirection vers login.html");
+            document.location = 'login.html?redirect=manual';
+        } else {
+            localStorage.setItem('redirect-count', '0'); // Réinitialiser après succès
+            console.log("Utilisateur authentifié, affichage de la page");
+
+            // Mettre à jour le nom d'utilisateur
+            const userNameElement = document.getElementById('user-name');
+            const userName = localStorage.getItem('chaif-ses-user-name') || 'Utilisateur';
+            if (userNameElement) {
+                userNameElement.textContent = userName;
+            }
+
+            // Configurer le bouton de déconnexion
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    localStorage.removeItem('chaif-ses-authenticated');
+                    localStorage.removeItem('chaif-ses-user-id');
+                    localStorage.removeItem('chaif-ses-user-email');
+                    localStorage.removeItem('chaif-ses-user-name');
+                    localStorage.removeItem('chaif-ses-user-role');
+                    localStorage.removeItem('chaif-ses-session-start');
+                    localStorage.setItem('redirect-count', '0');
+                    document.location = 'login.html?logout=true';
+                });
+            }
+        }
+    });
+    </script>
+    
+    <script type="module" src="js/init.js"></script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
