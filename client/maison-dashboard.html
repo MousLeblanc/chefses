@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maison - Chef SES</title>
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    .section {
+      margin: 2rem auto;
+      max-width: 600px;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+    }
+    .section h2 {
+      margin-bottom: 1rem;
+    }
+    textarea, input {
+      width: 100%;
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      background: #e67300;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background: #cc6600;
+    }
+    .results {
+      margin-top: 2rem;
+      padding: 1rem;
+      border: 1px dashed #aaa;
+      background: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <div class="section">
+    <h2>Ingrédients disponibles à la maison</h2>
+    <textarea id="ingredients" placeholder="Ex: pommes de terre, courgettes, riz, oeufs..."></textarea>
+
+    <label>
+      <input type="checkbox" id="onlyAvailable"> Utiliser uniquement les ingrédients disponibles
+    </label>
+
+    <button onclick="genererMenu()">Générer menu</button>
+
+    <div class="results" id="resultat-menu"></div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  const token = localStorage.getItem('token');
+  if (!token || !user) {
+    window.location.href = 'index.html';
+    return;
+  }
+  // Protection par rôle
+  if (user.role !== 'maison') { // Adapte selon le dashboard
+    window.location.href = 'index.html';
+    return;
+  }
+});
+
+    async function genererMenu() {
+      const ingredients = document.getElementById('ingredients').value;
+      const onlyAvailable = document.getElementById('onlyAvailable').checked;
+      const resultDiv = document.getElementById('resultat-menu');
+
+      resultDiv.innerHTML = "Génération en cours...";
+
+      try {
+        const res = await fetch('http://localhost:5000/api/menus/generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify({ ingredients, onlyAvailable })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          resultDiv.innerHTML = `Erreur: ${data.message || 'Une erreur est survenue'}`;
+          return;
+        }
+
+        resultDiv.innerHTML = '<h3>Menus suggérés :</h3>' +
+          '<ul>' +
+          data.menus.map(m => `<li>${m}</li>`).join('') +
+          '</ul>';
+
+      } catch (err) {
+        resultDiv.innerHTML = "Erreur de réseau ou serveur.";
+      }
+    }
+  </script>
+</body>
+</html>

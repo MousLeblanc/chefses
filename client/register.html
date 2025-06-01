@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inscription - ChAIf SES</title>
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Créer un compte ChAIf SES</h1>
+
+    <form id="register-form">
+      <label for="name">Nom complet</label>
+      <input type="text" id="name" required />
+
+      <label for="email">Email</label>
+      <input type="email" id="email" required />
+
+      <label for="password">Mot de passe</label>
+      <input type="password" id="password" required />
+
+      <label>Votre profil</label><br />
+      <input type="radio" name="role" id="role-maison" value="maison" />
+      <label for="role-maison">Maison</label><br />
+      <input type="radio" name="role" id="role-resto" value="resto" />
+      <label for="role-resto">Resto</label><br />
+      <input type="radio" name="role" id="role-fournisseur" value="fournisseur" />
+      <label for="role-fournisseur">Fournisseur</label><br />
+
+      <label for="businessName">Nom de l'établissement (optionnel)</label>
+      <input type="text" id="businessName" />
+
+      <button type="submit">S'inscrire</button>
+    </form>
+
+    <p>Déjà inscrit ? <a href="index.html">Se connecter</a></p>
+  </div>
+
+  <script src="js/register.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const defaultRole = params.get('role') || 'maison';
+    const roleElement = document.getElementById(`role-${defaultRole}`);
+    if (roleElement) {
+      roleElement.checked = true;
+    } else {
+      console.error(`Role element with id "role-${defaultRole}" not found.`);
+    }
+  </script>
+</body>
+</html>

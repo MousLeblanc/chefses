@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChAIf SES - Planification des Menus</title>
+    <link rel="stylesheet" href="css/main.css">
+  <!-- ✅ Local -->
+<link rel="stylesheet" href="./css/all.min.css">
+
+    </head>
+</head>
+<body>
+    <header>
+        <div class="logo">ChAIf SES</div>
+        <nav>
+            <ul>
+                <li><a href="accueil.html">Accueil</a></li>
+                <li><a href="stock.html">Inventaire</a></li>
+                <li><a href="menu.html">Menus</a></li>
+                <li><a href="planning.html" class="active">Planning</a></li>
+                <li><a href="suppliers.html">Fournisseurs</a></li>
+                <li><a href="settings.html">Paramètres</a></li>
+                <li><a href="#" class="logout-btn">Déconnexion</a></li>
+                
+            </ul>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <h1>Planification et Historique des Menus</h1>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="planning">Planning Hebdomadaire</div>
+            <div class="tab" data-tab="history">Historique des Menus</div>
+            <div class="tab" data-tab="stats">Statistiques d'Utilisation</div>
+        </div>
+        
+        <div id="planning-tab" class="tab-content active">
+            <div class="card">
+                <h2>Planning des Menus - Semaine du <span id="week-range">17 au 23 mai 2025</span></h2>
+                <div class="filter-bar">
+                    <div>
+                        <button id="prev-week" class="btn-primary">Semaine Précédente</button>
+                        <button id="next-week" class="btn-primary">Semaine Suivante</button>
+                    </div>
+                    <button id="generate-week-plan" class="btn-success">Générer un Planning Complet</button>
+                </div>
+                
+                <div class="calendar-header">
+                    <div class="day-name">Lundi</div>
+                    <div class="day-name">Mardi</div>
+                    <div class="day-name">Mercredi</div>
+                    <div class="day-name">Jeudi</div>
+                    <div class="day-name">Vendredi</div>
+                    <div class="day-name">Samedi</div>
+                    <div class="day-name">Dimanche</div>
+                </div>
+                
+                <div class="calendar">
+                    <!-- Lundi -->
+                    <div class="calendar-day">
+                        <div class="day-header">
+                            <span class="day-number">17 Mai</span>
+                            <div class="day-actions">
+                                <button class="day-action-btn add-menu-btn" data-date="2025-05-17">+</button>
+                            </div>
+                        </div>
+                        <div class="day-content">
+                            <div class="menu-item" data-menu-id="1001">
+                                <span class="menu-time">12:00</span>
+                                <div class="menu-title">Risotto aux Champignons</div>
+                                <div class="menu-guests">50 couverts</div>
+                            </div>
+                            <div class="menu-item" data-menu-id="1002">
+                                <span class="menu-time">19:00</span>
+                                <div class="menu-title">Poulet Rôti aux Herbes</div>
+                                <div class="menu-guests">45 couverts</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Mardi -->
+                    <div class="calendar-day">
+                        <div class="day-header">
+                            <span class="day-number">18 Mai</span>
+                            <div class="day-actions">
+                                <button class="day-action-btn add-menu-btn" data-date="2025-05-18">+</button>
+                            </div>
+                        </div>
+                        <div class="day-content">
+                            <div class="menu-item" data-menu-id="1003">
+                                <span class="menu-time">12:00</span>
+                                <div class="menu-title">Salade Niçoise</div>
+                                <div class="menu-guests">40 couverts</div>
+                            </div>
+                            <div class="menu-item" data-menu-id="1004">
+                                <span class="menu-time">19:00</span>
+                                <div class="menu-title">Spaghetti Carbonara</div>
+                                <div class="menu-guests">55 couverts</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Mercredi -->
+                    <div class="calendar-day">
+                        <div class="day-header">
+                            <span class="day-number">19 Mai</span>
+                            <div class="day-actions">
+                                <button class="day-action-btn add-menu-btn" data-date="2025-05-19">+</button>
+                            </div>
+                        </div>
+                        <div class="day-content">
+                            <div class="menu-item" data-menu-id="1005">
+                                <span class="menu-time">12:00</span>
+                                <div class="menu-title">Buddha Bowl Végétarien</div>
+                                <div class="menu-guests">35 couverts</div>
+                            </div>
+                            <div class="menu-item" data-menu-id="1006">
+                                <span class="menu-time">19:00</span>
+                                <div class="menu-title">Filet de Dorade Grillé</div>
+                                <div class="menu-guests">50 couverts</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Jeudi -->
+                    <div class="calendar-day">
+                        <div class="day-header">
+                            <span class="day-number">20 Mai</span>
+                            <div class="day-actions">
+                                <button class="day-action-btn add-menu-btn" data-date="2025-05-20">+</button>
+                            </div>
+                        </div>
+                        <div class="day-content">
+                            <div class="menu-item" data-menu-id="1007">
+                                <span class="menu-time">12:00</span>
+                                <div class="menu-title">Tartines Avocat & Saumon</div>
+                                <div class="menu-guests">30 couverts</div>
+                            </div>
+                            <div class="menu-item" data-menu-id="1008">
+                                <span class="menu-time">19:00</span>
+                                <div class="menu-title">Bœuf Bourguignon</div>
+                                <div class="menu-guests">40 couverts</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Vendredi -->
+                    <div class="calendar-day">
+                        <div class="day-header">
+                            <span class="day-number">21 Mai</span>
+                            <div class="day-actions">
+                                <button class="day-action-btn add-menu-btn" data-date="2025-05-21">+</button>
+                            </div>
+                        </div>
+                        <div class="day-content">
+                            <div class="menu-item" data-menu-id="1009">
+                                <span class="menu-time">12:00</span>
+                                <div class="menu-title">Poké Bowl au Thon</div>
+                                <div class="menu-guests">45 couverts</div>
+                            </div>
+                            <div class="menu-item" data-menu-id="1010">
+                                <span class="menu-time">19:00</span>
+                                <div class="menu-title">Tajine d'Agneau</div>
+                                <div class="menu-guests">50 couverts</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Samedi -->
+                    <div class="calendar-day">
+                        <div class="day-header">
+                            <span class="day-number">22 Mai</span>
+                            <div class="day-actions">
+                                <button class="day-action-btn add-menu-btn" data-date="2025-05-22">+</button>
+                            </div>
+                        </div>
+                        <div class="day-content">
+                            <div class="menu-item" data-menu-id="1011">
+                                <span class="menu-time">12:00</span>
+                                <div class="menu-title">Quiche Lorraine</div>
+                                <div class="menu-guests">60 couverts</div>
+                            </div>
+                            <div class="menu-item" data-menu-id="1012">
+                                <span class="menu-time">19:00</span>
+                                <div class="menu-title">Entrecôte & Frites Maison</div>
+                                <div class="menu-guests">70 couverts</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Dimanche -->
+                    <div class="calendar-day">
+                        <div class="day-header">
+                            <span class="day-number">23 Mai</span>
+                            <div class="day-actions">
+                                <button class="day-action-btn add-menu-btn" data-date="2025-05-23">+</button>
+                            </div>
+                        </div>
+                        <div class="day-content">
+                            <div class="menu-item" data-menu-id="1013">
+                                <span class="menu-time">12:00</span>
+                                <div class="menu-title">Rôti de Bœuf & Gratin</div>
+                                <div class="menu-guests">65 couverts</div>
+                            </div>
+                            <div class="menu-item" data-menu-id="1014">
+                                <span class="menu-time">19:00</span>
+                                <div class="menu-title">Lasagnes Maison</div>
+                                <div class="menu-guests">55 couverts</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="planning-actions">
+                    <button id="export-planning" class="btn-primary">Exporter le Planning</button>
+                    <button id="print-planning" class="btn-primary">Imprimer</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="history-tab" class="tab-content">
+            <div class="card">
+                <h2>Historique des Menus Utilisés</h2>
+                <div class="filter-bar">
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="history-search" placeholder="Rechercher un menu...">
+                    </div>
+                    <div class="filter-group">
+                        <select id="history-period">
+                            <option value="all">Toutes les périodes</option>
+                            <option value="week">Cette semaine</option>
+                            <option value="month">Ce mois-ci</option>
+                            <option value="quarter">Ce trimestre</option>
+                        </select>
+                        <select id="history-sort">
+                            <option value="date-desc">Date (récent d'abord)</option>
+                            <option value="date-asc">Date (ancien d'abord)</option>
+                            <option value="guests-desc">Nombre de couverts (décroissant)</option>
+                            <option value="guests-asc">Nombre de couverts (croissant)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="history-list">
+                    <div class="history-item" data-menu-id="1001">
+                        <img src="/api/placeholder/160/160" alt="Risotto aux Champignons" class="history-image">
+                        <div class="history-content">
+                            <h3 class="history-title">Risotto aux Champignons</h3>
+                            <div class="history-meta">
+                                <span>📅 17 Mai 2025</span>
+                                <span>👤 50 couverts</span>
+                                <span>⏱️ Service du midi</span>
+                            </div>
+                            <p>Un risotto crémeux aux champignons, parfait pour un déjeuner élégant.</p>
+                        </div>
+                        <div class="history-actions">
+                            <button class="btn-primary view-menu-btn">Voir la recette</button>
+                            <button class="btn-success reuse-menu-btn">Réutiliser</button>
+                        </div>
+                    </div>
+                    
+                    <div class="history-item" data-menu-id="1002">
+                        <img src="/api/placeholder/160/160" alt="Poulet Rôti aux Herbes" class="history-image">
+                        <div class="history-content">
+                            <h3 class="history-title">Poulet Rôti aux Herbes</h3>
+                            <div class="history-meta">
+                                <span>📅 17 Mai 2025</span>
+                                <span>👤 45 couverts</span>
+                                <span>⏱️ Service du soir</span>
+                            </div>
+                            <p>Un poulet rôti classique avec des herbes fraîches et des pommes de terre.</p>
+                        </div>
+                        <div class="history-actions">
+                            <button class="btn-primary view-menu-btn">Voir la recette</button>
+                            <button class="btn-success reuse-menu-btn">Réutiliser</button>
+                        </div>
+                    </div>
+                    
+                    <div class="history-item" data-menu-id="1003">
+                        <img src="/api/placeholder/160/160" alt="Salade Niçoise" class="history-image">
+                        <div class="history-content">
+                            <h3 class="history-title">Salade Niçoise</h3>
+                            <div class="history-meta">
+                                <span>📅 18 Mai 2025</span>
+                                <span>👤 40 couverts</span>
+                                <span>⏱️ Service du midi</span>
+                            </div>
+                            <p>Une salade niçoise traditionnelle avec du thon, des œufs et des olives.</p>
+                        </div>
+                        <div class="history-actions">
+                            <button class="btn-primary view-menu-btn">Voir la recette</button>
+                            <button class="btn-success reuse-menu-btn">Réutiliser</button>
+                        </div>
+                    </div>
+                    
+                    <div class="history-item" data-menu-id="1004">
+                        <img src="/api/placeholder/160/160" alt="Spaghetti Carbonara" class="history-image">
+                        <div class="history-content">
+                            <h3 class="history-title">Spaghetti Carbonara</h3>
+                            <div class="history-meta">
+                                <span>📅 18 Mai 2025</span>
+                                <span>👤 55 couverts</span>
+                                <span>⏱️ Service du soir</span>
+                            </div>
+                            <p>Des pâtes carbonara crémeuses avec du lard et du parmesan.</p>
+                        </div>
+                        <div class="history-actions">
+                            <button class="btn-primary view-menu-btn">Voir la recette</button>
+                            <button class="btn-success reuse-menu-btn">Réutiliser</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="pagination">
+                    <div class="page-btn">«</div>
+                    <div class="page-btn active">1</div>
+                    <div class="page-btn">2</div>
+                    <div class="page-btn">3</div>
+                    <div class="page-btn">»</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="stats-tab" class="tab-content">
+            <div class="card">
+
+                <h2>Statistiques d'Utilisation des Menus</h2>
+                
+                <section class="stats-section"></section>
+                <h2>Statistiques</h2>
+  <div class="chart-container">
+    <canvas id="menuChart" width="400" height="200"></canvas>
+    <canvas id="ingredientChart" width="400" height="200"></canvas>
+  </div>
+</section>
+  <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">42</div>
+                        <div class="stat-label">Menus utilisés ce mois</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">1250</div>
+                        <div class="stat-label">Couverts servis</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">8.2/10</div>
+                        <div class="stat-label">Note moyenne des menus</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">32%</div>
+                        <div class="stat-label">Économie sur les ingrédients</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Utilisation des Menus par Catégorie</h3>
+                        <div class="chart-filters">
+                            <select id="chart-period">
+                                <option value="week">Cette semaine</option>
+                                <option value="month" selected>Ce mois-ci</option>
+                                <option value="quarter">Ce trimestre</option>
+                                <option value="year">Cette année</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="menu-usage-chart"></div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Top 10 des Ingrédients les Plus Utilisés</h3>
+                        <div class="chart-filters">
+                            <select id="ingredients-period">
+                                <option value="week">Cette semaine</option>
+                                <option value="month" selected>Ce mois-ci</option>
+                                <option value="quarter">Ce trimestre</option>
+                                <option value="year">Cette année</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="ingredients-usage-chart"></div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal de confirmation -->
+<div id="confirm-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">Confirmation</h3>
+      <button class="close-btn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p>Voulez-vous vraiment écraser le planning existant ?</p>
+      <div class="form-actions">
+        <button class="btn-primary" id="cancel-confirm-btn">Annuler</button>
+        <button class="btn-danger" id="confirm-generate-btn">Confirmer</button>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+<!-- Correct -->
+<script src="js/common.js"></script>
+<script type="module" src="js/planning.js"></script>
+<script type="module" src="js/init.js"></script>
+<script src="./js/libs/chart.js"></script>
+<script type="module" src="js/auth.js"></script>
+</body>
+</html>

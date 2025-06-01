@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Choisir un profil - ChAIf SES</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <style>
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .role-card {
+      border: 2px solid #ccc;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin: 1rem 0;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .role-card:hover {
+      background-color: #f9f9f9;
+      transform: scale(1.03);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Créer un compte ChAIf SES</h1>
+    <p>Choisissez votre profil</p>
+
+    <div class="role-card" data-role="maison">🏡 <strong>Maison</strong><br>Pour les particuliers : solo, couple ou famille.</div>
+    <div class="role-card" data-role="resto">🍽️ <strong>Resto</strong><br>Pour les professionnels : chefs, restaurants, traiteurs.</div>
+    <div class="role-card" data-role="fournisseur">📦 <strong>Fournisseur</strong><br>Pour les fournisseurs : publier produits & livrer les restos.</div>
+  </div>
+
+  <script>
+    document.querySelectorAll('.role-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const role = card.dataset.role;
+        window.location.href = `register.html?role=${role}`;
+      });
+    });
+  </script>
+</body>
+</html>

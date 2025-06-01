@@ -1,0 +1,118 @@
+Voici ta **To-Do List finale jusqu’au MVP (Minimum Viable Product)** **prêt à tester avec de vrais restaurateurs et lever des fonds Seed**. Elle est construite à partir de l’état actuel de ton app (frontend + backend + config) et est classée par priorité.
+
+---
+
+# ✅ TO-DO LIST JUSQU’A MVP
+
+## 🔧 1. **Connexion Frontend ⇄ Backend**
+
+🎯 Objectif : relier toutes les fonctionnalités aux routes Express/Mongo réelles
+
+* [ ] Modifier `auth.js` pour utiliser `/api/auth/login` et `/register`
+* [ ] Stocker le `token JWT` après connexion (`localStorage`)
+* [ ] Passer le `token` dans les headers des appels API (`Authorization: Bearer ...`)
+* [ ] Modifier les appels dans `menu-stock.js`, `planning.js`, `stock.js`, etc. pour consommer les vraies routes :
+
+  * `/api/menus` (GET, POST)
+  * `/api/stock` (GET, POST, PUT, DELETE)
+  * `/api/user/stats` pour dashboard
+* [ ] Supprimer les données mock et fallback frontend
+
+---
+
+## 🧠 2. **Connexion MongoDB réelle**
+
+🎯 Objectif : sauvegarde persistante des menus, stock, utilisateurs
+
+* [ ] Passer `MONGODB_URI` vers MongoDB Atlas
+* [ ] Créer les collections initiales : `users`, `menus`, `stocks`, `products`
+* [ ] Vérifier les modèles (`User`, `Menu`, `Stock`, `Product`)
+* [ ] Tester `Menu.calculateTotalIngredients()` (optimisation du stock auto)
+
+---
+
+## 🔐 3. **Authentification complète**
+
+🎯 Objectif : sécuriser l’accès et différencier les rôles
+
+* [ ] S’assurer que `authController.js` retourne bien le JWT et le user
+* [ ] Créer un `middleware` `authMiddleware.js` pour protéger les routes privées
+* [ ] Ajouter les rôles dans le JWT (`chef`, `fournisseur`)
+* [ ] Vérifier le rôle pour accéder aux pages sensibles (stock, menus, etc.)
+
+---
+
+## 📊 4. **Statistiques + Dashboard**
+
+🎯 Objectif : fournir des graphiques utiles au restaurateur
+
+* [ ] Utiliser `GET /api/user/stats`
+* [ ] Intégrer `Chart.js` dans une page `dashboard.html`
+* [ ] Afficher :
+
+  * Nombres de menus créés
+  * Ingrédients les plus utilisés
+  * Alertes de stock faible
+
+---
+
+## 🌍 5. **Déploiement public**
+
+🎯 Objectif : rendre l’app accessible aux testeurs/investisseurs
+
+### Backend (Render ou Railway)
+
+* [ ] Déployer `server.js` + routes
+* [ ] Ajouter variables d’environnement `.env.production`
+* [ ] Connecter à MongoDB Atlas
+
+### Frontend (Netlify ou Vercel)
+
+* [ ] Déployer `/client` (HTML/JS/CSS)
+* [ ] Mettre à jour les appels API (remplacer `localhost:5000` par URL prod)
+* [ ] Tester que tout fonctionne en ligne (login, stock, menus...)
+
+---
+
+## 🧪 6. **Tests utilisateur**
+
+🎯 Objectif : valider le MVP sur 2-3 cas réels avant levée
+
+* [ ] Créer 1 compte `chef` test et 1 compte `fournisseur`
+* [ ] Ajouter manuellement des produits et du stock
+* [ ] Générer 1 menu et planifier la semaine
+* [ ] Simuler la comparaison de fournisseurs
+* [ ] Utiliser l’app sur tablette ou téléphone pour vérif responsive
+
+---
+
+## 💼 7. **Préparation levée de fonds Seed**
+
+🎯 Objectif : présenter le produit avec impact
+
+* [ ] Créer un lien de démo publique
+* [ ] Filmer une courte vidéo (3 min) de la démo produit
+* [ ] Rédiger un pitch deck avec :
+
+  * Problème → Solution
+  * Démo screenshots
+  * Tech stack & MVP
+  * Vision produit et marché
+  * Besoin de financement et roadmap
+
+---
+
+## ⚠️ BONUS (facultatif mais utile)
+
+* [ ] Drag & Drop sur le planning
+* [ ] Support du thème sombre (activable dans `settings.html`)
+* [ ] Améliorer UX des alertes / erreurs
+* [ ] Ajouter validation frontend (ex: quantité stock)
+
+---
+
+## 🟢 MVP COMPLET = Quand ces 7 blocs sont validés ✅
+
+Souhaites-tu que je transforme cette liste en **checklist partagée ou fichier Notion/Trello** ?
+Ou préfères-tu un **README.md avec instructions dev + déploiement** ?
+
