@@ -1,0 +1,418 @@
+// ==== CHAÎNE DE PRODUCTION CHΔIF SES - MVP SEED (DÉCOMPOSITION DÉTAILLÉE) ====
+
+// -- ÉTAPE 1: CONNEXION FRONTEND ⇄ BACKEND & MONGODB RÉELLE --
+
+// 1.1: Configuration de la Base de Données MongoDB Atlas
+    // 1.1.1: OBTAIN MONGODB_ATLAS_URI from MongoDB Atlas dashboard.
+    // 1.1.2: UPDATE `process.env.MONGODB_URI` in `./.env` (backend) with MONGODB_ATLAS_URI.
+    // 1.1.3: INITIATE backend server (`npm run dev` or `node server.js`).
+    // 1.1.4: VERIFY console output for "✅ Connecté à MongoDB" message from `server.js`[cite: 1].
+    // 1.1.5: IF connection error, DEBUG `server.js` mongoose.connect() and URI.
+    // 1.1.6: ENSURE Mongoose schemas in `/models` (`User.js`, `Menu.js`, `Stock.js`, `Product.js`, `Order.js`, `Planning.js`) are correctly defined and will map to desired collections.
+
+// 1.2: Authentification Backend (Finalisation & Test)
+    // Contexte: `authController.js`, `authRoutes.js`, `User.js`.
+    // 1.2.1: TEST `POST /api/auth/register` (e.g., using Postman or a frontend test):
+        // - INPUT: `name`, `email`, `password`, `role`, `businessName`.
+        // - EXPECTED_BEHAVIOR: New user created in MongoDB 'users' collection (password hashed by `UserSchema.pre('save')`).
+        // - EXPECTED_OUTPUT: JSON response with `success: true`, JWT `token`, and user object (`_id`, `name`, `email`, `role`, `businessName`).
+    // 1.2.2: TEST `POST /api/auth/login`:
+        // - INPUT: `email`, `password` (of an existing user).
+        // - EXPECTED_BEHAVIOR: Authentication successful using `User.matchPassword()`.
+        // - EXPECTED_OUTPUT: JSON response with `success: true`, JWT `token`, and user object.
+    // 1.2.3: TEST `GET /api/auth/verify`:
+        // - INPUT: Valid JWT in `Authorization: Bearer <token>` header.
+        // - EXPECTED_BEHAVIOR: `authMiddleware.protect` validates token, injects `req.user`.
+        // - EXPECTED_OUTPUT: JSON response `{ valid: true }`.
+    // 1.2.4: TEST `GET /api/auth/verify` with INVALID/EXPIRED token:
+        // - EXPECTED_OUTPUT: JSON response `{ error: "Session expirée", ... }` with status 401.
+
+// 1.3: Authentification Frontend (Intégration API)
+    // Contexte: `client/js/auth.js`, `client/js/login.js`, `client/js/register.js`, `client/index.html`.
+    // 1.3.1: MODIFY `client/js/auth.js` - `Authentication.login(email, password)` method:
+        // - REPLACE current mock/AuthAPI logic with `fetch('http://localhost:5000/api/auth/login', { method: 'POST', ... })`.
+        // - ON_SUCCESS (response.ok):
+            // - `const data = await response.json();`
+            // - `localStorage.setItem('token', data.token);`
+            // - `localStorage.setItem('user', JSON.stringify(data.user));`
+            // - CALL `this.redirectToDashboard(data.user.role);` (ensure `getDashboardUrlForRole` is correct [cite: 4]).
+        // - ON_FAILURE: Handle error (display message to user).
+    // 1.3.2: MODIFY `client/js/auth.js` - `Authentication.register(name, email, password, role, businessName)` method:
+        // - REPLACE current mock/AuthAPI logic with `fetch('http://localhost:5000/api/auth/register', { method: 'POST', ... })`.
+        // - ON_SUCCESS: Redirect to login page (`index.html`) or auto-login (TBD based on UX preference).
+        // - ON_FAILURE: Handle error.
+    // 1.3.3: MODIFY `client/js/login.js`:
+        // - ENSURE `loginForm.addEventListener('submit', ...)` calls `auth.login(email, password)`.
+        // - REMOVE any direct `localStorage` manipulation for token/user (should be handled by `auth.js`).
+    // 1.3.4: MODIFY `client/js/register.js`:
+        // - ENSURE `register-form.addEventListener('submit', ...)` calls `auth.register(...)`.
+        // - The `showToast` and redirection to `index.html` is a good start.
+    // 1.3.5: MODIFY `client/js/index.js` (for `client/index.html`):
+        // - IF `localStorage.getItem('token')` exists:
+            // - CALL `fetch('http://localhost:5000/api/auth/verify', { headers: { 'Authorization': \`Bearer ${localStorage.getItem('token')}\` } })`.
+            // - IF response.ok:
+                // - `const user = JSON.parse(localStorage.getItem('user'));`
+                // - `auth.redirectToDashboard(user.role);` // Use auth instance method for consistency
+            // - ELSE (token invalid):
+                // - `localStorage.removeItem('token'); localStorage.removeItem('user');`
+    // 1.3.6: UPDATE `client/js/auth.js` - `Authentication.logout()`:
+        // - ADD `fetch('http://localhost:5000/api/auth/logout', { method: 'POST', headers: { 'Authorization': \`Bearer ${localStorage.getItem('token')}\` } })` (Optional: backend route to invalidate token if using a blacklist).
+        // - CLEAR `localStorage` (`token`, `user`).
+        // - `window.location.href = 'index.html';`
+
+// 1.4: Transmission du Token JWT pour les Appels API Protégés (Frontend)
+    // Contexte: All JS files in `client/js/` making API calls.
+    // 1.4.1: CREATE a helper function (e.g., in `client/js/apiHelper.js` or `client/js/auth.js`):
+        // `async function fetchProtectedAPI(url, options = {}) { ... }`
+        // This function should:
+            // - `const token = localStorage.getItem('token');`
+            // - IF no token, `auth.redirectToLogin()`.
+            // - `options.headers = { ...options.headers, 'Authorization': \`Bearer ${token}\`, 'Content-Type': 'application/json' };`
+            // - `const response = await fetch(url, options);`
+            // - IF `response.status === 401` (unauthorized): `auth.logout();` // Token might be expired/invalid
+            // - RETURN `response`;
+    // 1.4.2: REFACTOR all existing `fetch` calls in `dashboard.js`, `menu-stock.js`, `planning.js`, `stock.js`, `suppliers.js` to use this `fetchProtectedAPI` helper for routes requiring authentication.
+    // 1.4.3: MODIFY `client/js/auth.js` - `Authentication.isAuthenticated()`:
+        // - IF no token in `localStorage`, RETURN `false`.
+        // - CALL `fetchProtectedAPI('http://localhost:5000/api/auth/verify')`.
+        // - RETURN `response.ok`.
+
+// 1.5: Remplacement des Données Mock/LocalStorage par des Appels API (Frontend Modules)
+
+    // 1.5.1: Module Stock (`client/js/stock.js`, `client/stock.html`)
+        // 1.5.1.1: `refreshTable()`:
+            // - CALL `fetchProtectedAPI('http://localhost:5000/api/stock')` (maps to `stockController.getUserStock`).
+            // - `const { data } = await response.json();`
+            // - Populate table with `data` (which is `stock.items`).
+        // 1.5.1.2: `item-form.onsubmit`:
+            // - `const itemId = document.getElementById('item-id').value;`
+            // - `const payload = { name, category, quantity, unit, expiryDate };` (match `StockSchema.items` fields)
+            // - IF `itemId`:
+                // - CALL `fetchProtectedAPI(\`http://localhost:5000/api/stock/${itemId}\`, { method: 'PUT', body: JSON.stringify(payload) })`. (Requires new backend route `PUT /api/stock/:itemId` in `stockRoutes.js` and `stockController.updateStockItem`).
+            // - ELSE:
+                // - CALL `fetchProtectedAPI('http://localhost:5000/api/stock', { method: 'POST', body: JSON.stringify(payload) })`. (Requires new backend route `POST /api/stock` for adding single item, or adapt `stockController.updateUserStock` or frontend to send the whole list). *Current `updateUserStock` expects an array `items` in body.*
+        // 1.5.1.3: `window.deleteItem(id)`:
+            // - CALL `fetchProtectedAPI(\`http://localhost:5000/api/stock/${id}\`, { method: 'DELETE' })`. (Requires new backend route `DELETE /api/stock/:itemId` in `stockRoutes.js` and `stockController.deleteStockItem`).
+        // 1.5.1.4: REMOVE `suggestCategory` if category is handled by user input only or backend. If `initModalAutocomplete` sets category, ensure it's compatible with backend schema.
+
+    // 1.5.2: Module Génération de Menus (`client/js/menu-stock.js`, `client/menu.html`)
+        // 1.5.2.1: `fetchMenuFromBackend(servings)`:
+            // - VERIFY `POST http://localhost:5000/api/menus/generate` call is using `fetchProtectedAPI`.
+            // - VERIFY `menuController.generateMenu` correctly uses `req.user.id` to fetch `Stock.findOne({ user: req.user.id })`.
+        // 1.5.2.2: `openRecipeModal(recipeId)`:
+            // - IF recipe details are fetched from backend: CALL `fetchProtectedAPI(\`http://localhost:5000/api/menus/${recipeId}\`)` (maps to `menuController.getMenuById`).
+            // - Populate modal with response data.
+        // 1.5.2.3: `generateMenus()` function (if different from `fetchMenuFromBackend`):
+            // - ENSURE it calls the backend API, not just `chaifAPI.generateStockBasedMenus()` mock.
+
+    // 1.5.3: Module Planification (`client/js/planning.js`, `client/planning.html`)
+        // 1.5.3.1: `loadWeekMenus(startDate)`:
+            // - CALL `fetchProtectedAPI(\`http://localhost:5000/api/menus/week?start=${startDate}\`)` (maps to `menuController.getMenusByWeek`).
+            // - Populate calendar with menu data.
+        // 1.5.3.2: `generateWeekPlanning(startDate)`:
+            // - CALL `fetchProtectedAPI('http://localhost:5000/api/menus/generate-week', { method: 'POST', body: JSON.stringify({ startDate }) })`. (Requires `menuController.generateWeeklyMenu` or similar to be correctly mapped to this route in `menuRoutes.js`).
+        // 1.5.3.3: `add-menu-btn` event listener:
+            // - CALL `fetchProtectedAPI('http://localhost:5000/api/planning', { method: 'POST', body: JSON.stringify({ date, menuId, mealType, ... }) })` to add a specific menu to a specific date/meal slot in the user's planning. (Requires new backend route/controller logic for `Planning.js` model). Current `POST /api/menus` seems to be for creating new menu definitions.
+
+    // 1.5.4: Module Fournisseurs (`client/js/suppliers.js`, `client/suppliers.html`)
+        // 1.5.4.1: `loadSuppliers()`:
+            // - CALL `fetchProtectedAPI('http://localhost:5000/api/suppliers')`. (Requires new backend route `GET /api/suppliers` and controller to fetch all suppliers, or suppliers for the current user if they are user-specific).
+        // 1.5.4.2: `saveSuppliers()` (or individual save actions):
+            // - `saveSupplierForm()` when new supplier: `fetchProtectedAPI('http://localhost:5000/api/suppliers', { method: 'POST', body: JSON.stringify(supplierData) })`.
+            // - `saveSupplierForm()` when editing: `fetchProtectedAPI(\`http://localhost:5000/api/suppliers/${supplierId}\`, { method: 'PUT', body: JSON.stringify(supplierData) })`.
+        // 1.5.4.3: `deleteSupplier(supplierId)`:
+            // - CALL `fetchProtectedAPI(\`http://localhost:5000/api/suppliers/${supplierId}\`, { method: 'DELETE' })`.
+        // 1.5.4.4: `saveProductForm()` (for supplier's product):
+            // - IF new product: `fetchProtectedAPI(\`http://localhost:5000/api/suppliers/${supplierId}/products\`, { method: 'POST', body: JSON.stringify(productData) })`. (Requires backend routes on `supplierRoutes.js` linked to `supplierController.js` and `Product.js` model for supplier-specific products). *Current `supplierController.js` seems to manage products FOR a supplier, so this fits.*
+            // - IF editing product: `fetchProtectedAPI(\`http://localhost:5000/api/suppliers/${supplierId}/products/${productId}\`, { method: 'PUT', body: JSON.stringify(productData) })`.
+        // 1.5.4.5: `deleteProduct(supplierId, productId)`:
+            // - CALL `fetchProtectedAPI(\`http://localhost:5000/api/suppliers/${supplierId}/products/${productId}\`, { method: 'DELETE' })`.
+        // 1.5.4.6: `openOrderModal(supplierId)` in `suppliers.js`:
+            // - Form submission should call `fetchProtectedAPI('http://localhost:5000/api/restaurant/orders', { method: 'POST', body: JSON.stringify(orderDetails) })` if the user is a 'resto'. (This assumes `restaurantRoutes.js` is for 'resto' users ordering FROM suppliers).
+
+    // 1.5.5: Tableau de Bord (`client/js/dashboard.js`, `client/accueil.html` script inline)
+        // 1.5.5.1: `loadStockData()`: CALL `fetchProtectedAPI('http://localhost:5000/api/stock')`. Adapt logic to count total, low stock, expiring based on API response.
+        // 1.5.5.2: `loadPlanningData()`: CALL `fetchProtectedAPI(\`http://localhost:5000/api/menus/week?start=YYYY-MM-DD\`)`.
+        // 1.5.5.3: `getMenuNameById(menuId)`: CALL `fetchProtectedAPI(\`http://localhost:5000/api/menus/${menuId}\`)` to get menu title.
+        // 1.5.5.4: `loadAlerts()`: Base on data from `fetchProtectedAPI('http://localhost:5000/api/stock')`.
+        // 1.5.5.5: `loadSupplierData()`: CALL `fetchProtectedAPI('http://localhost:5000/api/suppliers')` for total count.
+            // - For pending orders: CALL `fetchProtectedAPI('http://localhost:5000/api/restaurant/orders/stats')` or `fetchProtectedAPI('http://localhost:5000/api/supplier/orders/stats')` depending on user role.
+        // 1.5.5.6: Inline script in `accueil.html` for stock summary:
+            // - MODIFY to use `fetchProtectedAPI('http://localhost:5000/api/stock')` instead of `localStorage.getItem('stock')`.
+
+    // 1.5.6: REMOVE ALL MOCK DATA: `getDemoIngredients()`, `getDemoPlanning()`, `getDemoMenus()`, `getDefaultSuppliers()` from relevant JS files.
+    // 1.5.7: REMOVE ALL FALLBACKS to `localStorage` for primary data once API integration is complete.
+
+// 1.6: Gestion des Rôles au Niveau API (Backend)
+    // Contexte: `middleware/authMiddleware.js` (`protect`), `middleware/roleMiddleware.js`.
+    // 1.6.1: IMPLEMENT `middleware/roleMiddleware.js`:
+        // ```javascript
+        // export const authorize = (...roles) => {
+        //   return (req, res, next) => {
+        //     if (!req.user || !roles.includes(req.user.role)) {
+        //       return res.status(403).json({ message: 'Forbidden: Insufficient role privileges' });
+        //     }
+        //     next();
+        //   };
+        // };
+        // ```
+    // 1.6.2: APPLY `protect` and `authorize('roleName')` middlewares in `/routes/*.js` files:
+        // - Example in `supplierRoutes.js` (already seems to use a `roleMiddleware` but ensure it's this new one):
+            // `router.post('/products', protect, authorize('fournisseur'), supplierController.addProduct);`
+        // - Example in `menuRoutes.js`:
+            // `router.post('/generate', protect, authorize('resto', 'maison'), menuController.generateMenu);`
+        // - Example in `stockRoutes.js`:
+            // `router.put('/', protect, authorize('resto', 'maison'), stockController.updateUserStock);` // Assuming only these roles manage their own stock.
+        // - Review all routes and apply appropriate role restrictions.
+
+// -- ÉTAPE 2: FINALISATION DU MODULE DE PLANIFICATION --
+    // Contexte: `client/planning.html`, `client/js/planning.js`, `controllers/planningController.js`, `models/Planning.js`.
+
+    // 2.1: CSS des Modales de Planification
+        // 2.1.1: IDENTIFY modals specific to planning (e.g., "Add Menu to Day", "Edit Planned Menu").
+        // 2.1.2: ENSURE CSS in `client/css/main.css` or `<style>` in `planning.html` correctly styles these modals for visibility, layout, and responsiveness.
+
+    // 2.2: Logique de Planification Frontend (`client/js/planning.js`)
+        // 2.2.1: `addMenuToDay(date, menuId, mealType)`:
+            // - CALL `fetchProtectedAPI('http://localhost:5000/api/planning', { method: 'POST', body: JSON.stringify({ date, menuId, mealType, userId: req.user.id }) })`.
+            // - Backend `planningController.addMenuToPlanning` should find or create a `Planning` document for the user and add/update the day's menu.
+        // 2.2.2: `editPlannedMenu(planningEntryId, newMenuId, newMealType)`:
+            // - CALL `fetchProtectedAPI(\`http://localhost:5000/api/planning/${planningEntryId}\`, { method: 'PUT', body: JSON.stringify({ menuId: newMenuId, mealType: newMealType }) })`.
+            // - Backend `planningController.updatePlannedMenu` updates the specific entry.
+        // 2.2.3: `deletePlannedMenu(planningEntryId)`:
+            // - CALL `fetchProtectedAPI(\`http://localhost:5000/api/planning/${planningEntryId}\`, { method: 'DELETE' })`.
+            // - Backend `planningController.deletePlannedMenu` removes the entry.
+
+    // 2.3: Initialisation du Planning
+        // 2.3.1: IN `client/js/planning.js`, `DOMContentLoaded` listener:
+            // - `const currentMondayFormatted = formatDateISO(currentMonday);`
+            // - CALL `loadWeekMenus(currentMondayFormatted);`
+        // 2.3.2: `loadWeekMenus(startDate)` in `planning.js`:
+            // - CALL `fetchProtectedAPI(\`http://localhost:5000/api/planning/week?startDate=${startDate}\`)`.
+            // - This backend route (`planningRoutes.js` -> `planningController.getWeeklyPlanning`) should fetch `Planning` data for the user for the given week.
+            // - `updateCalendarWithMenus(menusFromAPI)` should populate the calendar.
+
+    // 2.4: Glisser-Déposer (Drag & Drop) pour le Calendrier
+        // 2.4.1: CHOOSE and INTEGRATE a Drag & Drop library (e.g., SortableJS) into `client/js/planning.js`.
+            // - `npm install sortablejs --save` (if using npm for frontend dependencies, otherwise include via CDN).
+            // - Initialize SortableJS on `.calendar-day .day-content` elements to allow dragging `.menu-item` elements.
+        // 2.4.2: ON `onEnd` or `onDrop` event from SortableJS:
+            // - GET `menuItemId = draggedElement.dataset.menuId;` (or a planning entry ID if available).
+            // - GET `newDate = targetDayElement.dataset.date;`
+            // - GET `newMealType = determineMealTypeFromDropPosition(targetDayElement, dropCoordinates);` (logic needed here).
+            // - CALL `fetchProtectedAPI(\`http://localhost:5000/api/planning/move\`, { method: 'PUT', body: JSON.stringify({ planningEntryId: menuItemId, newDate, newMealType }) })`.
+            // - Backend `planningController.movePlannedMenu` handles the update.
+            // - REFRESH local calendar view or update UI optimistically.
+
+    // 2.5: Tests du Module de Planification
+        // 2.5.1: TEST initial load and display for an empty planning.
+        // 2.5.2: TEST week navigation (prev/next) updates and loads data correctly.
+        // 2.5.3: TEST `generateWeekPlanning()` API call and subsequent display.
+        // 2.5.4: TEST adding a menu to a specific day/meal slot.
+        // 2.5.5: TEST editing a planned menu (e.g., change menu or meal type).
+        // 2.5.6: TEST deleting a planned menu.
+        // 2.5.7: TEST drag & drop functionality:
+            // - Moving a menu to a different day.
+            // - Moving a menu to a different meal slot within the same day.
+            // - VERIFY changes are persisted in the backend and correctly reloaded.
+
+// -- ÉTAPE 3: DÉVELOPPEMENT COMPLET DE LA PAGE FOURNISSEURS --
+    // Contexte: `client/suppliers.html`, `client/js/suppliers.js`, `client/js/supplier-comparison.js`, `models/Product.js`, `models/Order.js`, related backend routes and controllers.
+
+    // 3.1: Structure HTML & Affichage Dynamique des Fournisseurs et Produits
+        // 3.1.1: IN `client/js/suppliers.js`, `renderSuppliersList()`:
+            // - FETCH data from `GET http://localhost:5000/api/suppliers` (ensure this route is protected and returns suppliers, perhaps all for admin, or linked for resto/fournisseur).
+            // - Populate the `.suppliers-list` div.
+        // 3.1.2: IN `client/js/suppliers.js`, `renderSupplierDetails()`:
+            // - When a supplier is selected, FETCH its details and products: `GET http://localhost:5000/api/suppliers/${supplierId}` and `GET http://localhost:5000/api/suppliers/${supplierId}/products`.
+            // - Populate the `.supplier-details` div. Ensure `getCategoryName()` and `getStarsHTML()` are working.
+
+    // 3.2: Formulaire Ajout/Modification Fournisseur (Frontend + Backend)
+        // 3.2.1: Frontend (`client/js/suppliers.js`, `saveSupplierForm()`):
+            // - IF new supplier: `fetchProtectedAPI('http://localhost:5000/api/suppliers', { method: 'POST', body: JSON.stringify(supplierData) })`.
+            // - IF editing supplier: `fetchProtectedAPI(\`http://localhost:5000/api/suppliers/${supplierId}\`, { method: 'PUT', body: JSON.stringify(supplierData) })`.
+        // 3.2.2: Backend (`routes/supplierRoutes.js`, `controllers/supplierController.js` - *Note: current files seem more for supplier's own management rather than a general supplier directory*):
+            // - CREATE `POST /api/suppliers` route -> `supplierController.createSupplier` (creates a new `User` with role 'fournisseur' or a new entry in a dedicated 'Suppliers' collection if different from Users).
+            // - CREATE `PUT /api/suppliers/:id` route -> `supplierController.updateSupplier` (updates the supplier's info).
+            // - CREATE `DELETE /api/suppliers/:id` route -> `supplierController.deleteSupplier`.
+            // - CREATE `GET /api/suppliers` route -> `supplierController.getAllSuppliers`.
+            // - CREATE `GET /api/suppliers/:id` route -> `supplierController.getSupplierById`.
+
+    // 3.3: Formulaire Ajout/Modification Produits du Fournisseur (Frontend + Backend)
+        // 3.3.1: Frontend (`client/js/suppliers.js`, `saveProductForm()`):
+            // - This is for a 'fournisseur' role managing their own products.
+            // - IF new product: `fetchProtectedAPI('http://localhost:5000/api/supplier/products', { method: 'POST', body: JSON.stringify(productData) })` (using existing `supplierRoutes.js` which is for supplier's own products).
+            // - IF editing product: `fetchProtectedAPI(\`http://localhost:5000/api/supplier/products/${productId}\`, { method: 'PUT', body: JSON.stringify(productData) })`.
+        // 3.3.2: `deleteProduct(supplierId, productId)` in `suppliers.js` should call `fetchProtectedAPI(\`http://localhost:5000/api/supplier/products/${productId}\`, { method: 'DELETE' })` if current user is the supplier.
+
+    // 3.4: Système de Comparaison de Prix (`client/js/supplier-comparison.js`)
+        // 3.4.1: INTEGRATE `compareSuppliers()` in `client/menu.html` (Tab "Comparaison Fournisseurs") or a dedicated section.
+        // 3.4.2: ON ingredient search:
+            // - CALL backend API: `GET http://localhost:5000/api/products/search?name=${ingredientName}`. This route needs to search across all suppliers' products (requires a `Product` model that links to a supplier User, and a controller method to perform this search).
+            // - `productController.searchProductsByName(ingredientName)` (new controller method).
+        // 3.4.3: PASS the fetched products (grouped by supplier or flat list with supplier info) to `compareSuppliers()` function.
+        // 3.4.4: DISPLAY results in the `supplier-comparison` table in `menu.html`.
+
+    // 3.5: Module de Gestion des Commandes (Restaurant faisant une commande)
+        // 3.5.1: UI (e.g., in `suppliers.html` when viewing a supplier's products, or `menu.html` comparison tab):
+            // - ADD "Add to Cart" or "Order" button next to products.
+            // - IMPLEMENT a simple cart mechanism (frontend state or `localStorage`).
+        // 3.5.2: `placeOrder()` function:
+            // - `const orderDetails = { items: cartItems, supplierId, deliveryDate, notes };`
+            // - CALL `fetchProtectedAPI('http://localhost:5000/api/restaurant/orders', { method: 'POST', body: JSON.stringify(orderDetails) })` (route in `restaurantRoutes.js` -> `restaurantController.createOrder`).
+            // - `restaurantController.createOrder` should:
+                // - Validate items, supplier.
+                // - Calculate total.
+                // - Create `Order` document with `client: req.user.id`, `supplier: supplierId`.
+        // 3.5.3: UI for viewing own orders (Restaurant):
+            // - New page or section.
+            // - CALL `fetchProtectedAPI('http://localhost:5000/api/restaurant/orders')` -> `restaurantController.getOrders`.
+            // - Display orders and their status.
+            // - Implement `cancelOrder` by calling `PUT /api/restaurant/orders/:id/cancel`.
+
+    // 3.6: Module de Gestion des Commandes (Fournisseur recevant une commande)
+        // Contexte: `client/supplier-dashboard.html`, `client/js/supplier-dashboard.js`.
+        // 3.6.1: `loadOrders()`:
+            // - CALL `fetchProtectedAPI('http://localhost:5000/api/supplier/orders')` (route in `supplierRoutes.js` -> `supplierController.getOrders`).
+            // - `displayOrders(orders)` populates the list.
+        // 3.6.2: `updateOrderStatus(orderId, status)` function to be created in `supplier-dashboard.js`:
+            // - CALL `fetchProtectedAPI(\`http://localhost:5000/api/supplier/orders/${orderId}/status\`, { method: 'PUT', body: JSON.stringify({ status }) })` (route in `supplierRoutes.js` -> `supplierController.updateOrderStatus`).
+            // - REFRESH order list.
+
+    // 3.7: Tests des Modules Fournisseurs et Commandes
+        // 3.7.1: TEST CRUD for suppliers (if a general directory is implemented).
+        // 3.7.2: TEST 'fournisseur' role: CRUD for their own products, view/manage their orders.
+        // 3.7.3: TEST 'resto' role: view supplier products, compare prices, create orders, view own order history.
+        // 3.7.4: TEST order status updates reflect correctly for both 'resto' and 'fournisseur'.
+
+// -- ÉTAPE 4: DÉVELOPPEMENT COMPLET DE LA PAGE PARAMÈTRES --
+    // Contexte: `client/settings.html`, `client/profile.html`, associated JS, `models/User.js`.
+
+    // 4.1: Paramètres Généraux et Profil Utilisateur (`client/settings.html`, `client/profile.html`)
+        // 4.1.1: JS for `settings.html` (e.g., `client/js/settings.js` - needs creation):
+            // - `loadSettings()`: `fetchProtectedAPI('http://localhost:5000/api/user/profile')` (maps to `userController.getUserProfile` - needs creation).
+            // - Populate form fields with user data (name, email, businessName, restaurantName, currency, language, itemsPerPage from user profile).
+        // 4.1.2: `saveGeneralSettingsForm.onsubmit`:
+            // - `fetchProtectedAPI('http://localhost:5000/api/user/profile', { method: 'PUT', body: JSON.stringify(settingsData) })`.
+            // - Backend `userController.updateUserProfile` updates `User` model.
+        // 4.1.3: JS for "Compte" section / `profile.html` (adapt existing `profile.html` script):
+            // - `loadProfileInfo()`: Use `fetchProtectedAPI` for `GET /api/user/profile`.
+            // - `updateProfile()`: Use `fetchProtectedAPI` for `PUT /api/user/profile`.
+            // - `changePassword()`:
+                // - `fetchProtectedAPI('http://localhost:5000/api/user/change-password', { method: 'PUT', body: JSON.stringify({ currentPassword, newPassword }) })`.
+                // - Backend `userController.changePassword` handles password verification and update.
+
+    // 4.2: Paramètres d'Apparence (Frontend Focus)
+        // 4.2.1: IN `client/js/settings.js` (or `init.js`):
+            // - `themeCards.forEach(card.addEventListener('click', ...))`:
+                // - `localStorage.setItem('user-theme', selectedTheme);`
+                // - `applyTheme(selectedTheme);` (function to change CSS variables or stylesheet links).
+            // - `primaryColorInput.onchange`, `secondaryColorInput.onchange`, etc.:
+                // - Store in `localStorage`.
+                // - `applyCustomColors(...);`
+            // - `fontSizeSelect.onchange`:
+                // - Store in `localStorage`.
+                // - `applyFontSize(...);`
+        // 4.2.2: ON PAGE LOAD (e.g., in `init.js`):
+            // - `const savedTheme = localStorage.getItem('user-theme'); if (savedTheme) applyTheme(savedTheme);`
+            // - Similar for custom colors and font size.
+        // 4.2.3: (Optional Backend Persist) Save theme/appearance settings to user profile via `PUT /api/user/profile`.
+
+    // 4.3: Paramètres de Notifications (Backend + Frontend)
+        // 4.3.1: IN `client/js/settings.js`:
+            // - `notificationsForm.onsubmit`:
+                // - `const notificationPrefs = { stockAlerts: checkbox.checked, ... };`
+                // - `fetchProtectedAPI('http://localhost:5000/api/user/profile/notifications', { method: 'PUT', body: JSON.stringify(notificationPrefs) })`. (New route/controller).
+        // 4.3.2: Backend `userController.updateNotificationPreferences`:
+            // - Store preferences in `User` model (add new fields to `UserSchema`).
+        // 4.3.3: Backend logic for sending notifications (e.g., daily email for low stock) will read these preferences.
+
+    // 4.4: Intégrations API (MarketMan, Spoonacular - Clés Utilisateur)
+        // 4.4.1: IN `client/js/settings.js`:
+            // - `integrationsForm.onsubmit`:
+                // - `const apiKeys = { marketmanApiKey: input.value, spoonacularApiKey: input.value };`
+                // - `fetchProtectedAPI('http://localhost:5000/api/user/apikeys', { method: 'PUT', body: JSON.stringify(apiKeys) })`.
+        // 4.4.2: Backend `userController.updateApiKeys`:
+            // - Encrypt and store API keys in `User` model (add new fields).
+            // - **NEVER** send these keys back to the frontend after saving.
+        // 4.4.3: Backend services using these APIs (e.g., `openaiservice.js`) must fetch the user's specific key from their profile before making an external call.
+
+    // 4.5: Sauvegarde et Réinitialisation des Données (Tel que défini précédemment - tâche complexe)
+        // 4.5.1: Implement `GET /api/backup/export` -> `backupController.exportUserData`.
+        // 4.5.2: Implement `POST /api/backup/import` -> `backupController.importUserData`.
+        // 4.5.3: Implement `DELETE /api/user/data` -> `userController.resetUserData`.
+        // 4.5.4: Frontend JS in `settings.js` to trigger these API calls.
+
+// -- ÉTAPE 5: GRAPHIQUES DE STATISTIQUES --
+    // Contexte: `client/planning.html` (Tab Stats), Chart.js.
+
+    // 5.1: API Backend pour les Statistiques (Exemples)
+        // 5.1.1: `routes/statsRoutes.js` (new file):
+            // - `router.get('/menu-usage', protect, statsController.getMenuUsageStats);`
+            // - `router.get('/ingredient-usage', protect, statsController.getIngredientUsageStats);`
+        // 5.1.2: `controllers/statsController.js` (new file):
+            // - `getMenuUsageStats(req, res)`:
+                // - Query `Planning` model for `req.user.id` within `req.query.period`.
+                // - Aggregate counts of each `menuId`.
+                // - Populate `menuTitle` using `Menu` model.
+                // - Return `[{ title: 'Menu A', count: 10 }, ...]`.
+            // - `getIngredientUsageStats(req, res)`:
+                // - Query `Planning` for menus, then `Menu` for ingredients of those menus.
+                // - Aggregate quantities of each ingredient.
+                // - Return `[{ name: 'Tomate', totalQuantity: 50, unit: 'kg' }, ...]`.
+
+    // 5.2: Implémentation Frontend des Graphiques (`client/js/planning.js` or new `stats.js`)
+        // 5.2.1: `function loadMenuUsageChart(period = 'month') { ... }`:
+            // - `const data = await fetchProtectedAPI(\`http://localhost:5000/api/stats/menu-usage?period=${period}\`).then(res => res.json());`
+            // - `const labels = data.map(item => item.title);`
+            // - `const values = data.map(item => item.count);`
+            // - `new Chart(document.getElementById('menu-usage-chart-canvas'), { type: 'bar', data: { labels, datasets: [{ label: 'Utilisation', data: values }] } });`
+        // 5.2.2: `function loadIngredientUsageChart(period = 'month') { ... }`:
+            // - Similar logic for ingredient usage, perhaps a pie chart or horizontal bar chart.
+        // 5.2.3: EVENT LISTENERS for period selectors (`#chart-period`, `#ingredients-period`) to call load functions.
+        // 5.2.4: CALL initial load functions in `DOMContentLoaded` or when Stats tab is activated.
+
+// -- ÉTAPE 6: DÉPLOIEMENT --
+    // Suivre les instructions générales du README.md et TO DO TO GO SEED.txt.
+
+    // 6.1: Backend (e.g., Render)
+        // 6.1.1: PUSH code to Git repository.
+        // 6.1.2: CREATE new Web Service on Render, connect to Git repo.
+        // 6.1.3: SET Build Command: `npm install`.
+        // 6.1.4: SET Start Command: `npm run start` (which runs `node server.js`).
+        // 6.1.5: ADD Environment Variables: `MONGODB_URI` (Atlas PROD string), `JWT_SECRET` (strong secret), `NODE_ENV=production`, `PORT` (Render sets this, but good to have if needed), `OPENAI_API_KEY` (if used by backend).
+        // 6.1.6: DEPLOY and MONITOR logs for successful start and DB connection.
+
+    // 6.2: Frontend (e.g., Netlify)
+        // 6.2.1: PUSH `/client` folder content to Git repository (or ensure main repo includes it and Netlify points to this subfolder).
+        // 6.2.2: CREATE new site on Netlify, connect to Git repo.
+        // 6.2.3: SET Build Command (if any, e.g., if using a bundler for JS/CSS, otherwise often empty for static sites).
+        // 6.2.4: SET Publish Directory: `client` (or the output of your build step).
+        // 6.2.5: UPDATE all `fetch` URLs in `client/js/*.js` files from `http://localhost:5000/api` to `https://<your-render-backend-url>/api`. This can be done with an environment variable if Netlify build process allows JS bundling.
+        // 6.2.6: CONFIGURE `_redirects` file in `client` folder for SPA routing: `/* /index.html 200`.
+        // 6.2.7: DEPLOY and TEST.
+
+    // 6.3: Tests Post-Déploiement
+        // 6.3.1: REPEAT all major functionality tests (login, stock, menu gen, planning, suppliers) on the deployed URLs.
+        // 6.3.2: CHECK browser console for errors.
+        // 6.3.3: VERIFY HTTPS is working for both frontend and backend.
+
+// -- ÉTAPE 7 & 8: TESTS UTILISATEUR & PRÉPARATION LEVÉE DE FONDS --
+    // Ces étapes sont moins techniques et plus orientées business/produit, suivre le `TO DO TO GO SEED.txt`.
+    // 7.1: CREATE test accounts as per `TO DO TO GO SEED.txt`.
+    // 7.2: EXECUTE test scenarios.
+    // 8.1: SET UP public demo link.
+    // 8.2: RECORD demo video.
+    // 8.3: COMPILE pitch deck.
+
+// -- BONUS (Post-MVP Seed) --
+    // B.1: Drag & Drop (re-verify if done in Étape 2.4).
+    // B.2: Frontend Form Validation:
+        // - ADD client-side validation to all forms (e.g., `required` attributes, pattern matching, custom JS checks).
+        // - DISPLAY error messages near respective fields.
+    // B.3: Image Management:
+        // - BACKEND: Add routes for image upload (e.g., `POST /api/upload/image`) using `multer` or similar.
+        // - SERVICE: Integrate with Cloudinary/S3 for storage.
+        // - FRONTEND: Add file input fields where images are needed (user profile, menu items). Upload image, get URL back, save URL.
+
+END_OF_DETAILED_PRODUCTION_CHAIN

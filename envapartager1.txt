@@ -1,0 +1,23 @@
+# Configuration de base
+NODE_ENV=development
+PORT=5000
+
+# Base de données
+# Utilisez une URL formatée correctement et avec des identifiants sécurisés
+MONGODB_URI=mongodb+srv://MousLeblanc:xxxxxxxxxxxxx@cluster0.wyfanez.mongodb.net/?chefses=true&w=majority&appName=Cluster0
+
+# Sécurité
+# Utilisez une chaîne aléatoire complexe et longue d'au moins 32 caractères
+JWT_SECRET=supersecretchaif
+JWT_EXPIRE=86400 # 24 heures en secondes
+
+# Configuration CORS
+CORS_ORIGIN=http://localhost:3000
+
+# API Externes
+# Ne stockez jamais de vraies clés API dans des fichiers versionnés
+OPENAI_API_KEY=sk-proj-B3xxxxxxxxx
+
+# Configuration spécifique pour ChAIf SES
+STOCK_ALERT_THRESHOLD=10 # Seuil par défaut pour les alertes de stock
+MENU_DEFAULT_SERVINGS=4 # Nombre de portions par défaut pour les menus générés
