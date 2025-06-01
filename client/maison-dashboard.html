@@ -3,28 +3,69 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maison - Chef SES</title>
+  <title>Maison - ChAIf SES</title>
   <link rel="stylesheet" href="css/main.css">
   <style>
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+    }
+    header { 
+      background: #2c3e50;
+      color: #fff;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+    }
     .section {
       margin: 2rem auto;
-      max-width: 600px;
+      max-width: 700px; /
       background: #fff;
       padding: 2rem;
       border-radius: 12px;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); 
     }
     .section h2 {
-      margin-bottom: 1rem;
+      margin-top: 0; /* Pas de marge en haut pour le premier titre de section */
+      margin-bottom: 1.5rem; /* Marge augmentée */
+      color: #2c3e50; /* Couleur du titre */
     }
-    textarea, input {
-      width: 100%;
+    textarea, input[type="text"], input[type="checkbox"] { /* input[type="text"] ajouté */
+      width: calc(100% - 1.5rem); /* Ajustement pour padding */
       margin-bottom: 1rem;
       padding: 0.75rem;
       border: 1px solid #ccc;
       border-radius: 8px;
+      box-sizing: border-box; /* Important pour le padding et la largeur */
     }
-    button {
+    input[type="checkbox"] {
+        width: auto; /* Checkbox n'a pas besoin de toute la largeur */
+        margin-right: 0.5rem;
+        vertical-align: middle;
+    }
+    label {
+        display: block; /* Chaque label sur sa ligne */
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+        color: #555;
+    }
+    label input[type="checkbox"] + span { /* Pour le texte à côté de la checkbox */
+        vertical-align: middle;
+        font-weight: normal;
+    }
+
+    button, .button { /* Classe .button pour les liens stylés comme des boutons */
       background: #e67300;
       color: white;
       border: none;
@@ -32,60 +73,127 @@
       border-radius: 8px;
       cursor: pointer;
       font-weight: bold;
+      text-decoration: none; /* Pour les liens stylés */
+      display: inline-block; /* Pour les liens stylés */
+      transition: background-color 0.3s ease;
     }
-    button:hover {
+    button:hover, .button:hover {
       background: #cc6600;
+    }
+    button:disabled { /* Style pour bouton désactivé */
+        background: #ccc;
+        cursor: not-allowed;
     }
     .results {
       margin-top: 2rem;
-      padding: 1rem;
-      border: 1px dashed #aaa;
+      padding: 1.5rem; /* Padding augmenté */
+      border: 1px solid #e0e0e0; /* Bordure plus douce */
       background: #f9f9f9;
+      border-radius: 8px; 
+        }
+    .results h3 {
+        margin-top: 0;
+        color: #e67300;
+    }
+    .results ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+    .results ul li {
+        padding: 0.5rem 0;
+        border-bottom: 1px dotted #ddd;
+    }
+    .results ul li:last-child {
+        border-bottom: none;
+    }
+    #logout-btn { 
+        background-color: #e74c3c;
+    }
+    #logout-btn:hover {
+        background-color: #c0392b;
     }
   </style>
 </head>
 <body>
+
+  <header>
+    <h1>Mon Espace Maison</h1>
+    <button id="logout-btn">Déconnexion</button>
+  </header>
+
   <div class="section">
-    <h2>Ingrédients disponibles à la maison</h2>
-    <textarea id="ingredients" placeholder="Ex: pommes de terre, courgettes, riz, oeufs..."></textarea>
+    <h2>Générateur de Menus Personnalisés</h2>
+    
+    <label for="ingredients">Ingrédients disponibles à la maison :</label>
+    <textarea id="ingredients" placeholder="Ex: pommes de terre, courgettes, riz, oeufs..." rows="4"></textarea> 
 
-    <label>
-      <input type="checkbox" id="onlyAvailable"> Utiliser uniquement les ingrédients disponibles
-    </label>
+    <div> 
+      <label>
+        <input type="checkbox" id="onlyAvailable">
+        <span>Utiliser uniquement les ingrédients disponibles</span>
+      </label>
+    </div>
 
-    <button onclick="genererMenu()">Générer menu</button>
+    <button id="generer-menu-btn" onclick="genererMenu()">Générer menu</button> 
 
-    <div class="results" id="resultat-menu"></div>
+    <div class="results" id="resultat-menu">
+      <p>Entrez vos ingrédients et cliquez sur "Générer menu" pour voir des suggestions.</p> 
+    </div>
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
-  const token = localStorage.getItem('token');
-  if (!token || !user) {
-    window.location.href = 'index.html';
-    return;
-  }
-  // Protection par rôle
-  if (user.role !== 'maison') { // Adapte selon le dashboard
-    window.location.href = 'index.html';
-    return;
-  }
-});
+      const user = JSON.parse(localStorage.getItem('user') || 'null');
+      const token = localStorage.getItem('token');
+
+      if (!token || !user) {
+        window.location.href = 'index.html';
+        return;
+      }
+      // Protection par rôle
+      if (user.role !== 'maison') {
+        // Si le rôle n'est pas 'maison', déconnecter et rediriger
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        window.location.href = 'index.html';
+        return;
+      }
+
+      // Logique pour le bouton de déconnexion
+      const logoutButton = document.getElementById('logout-btn');
+      if (logoutButton) {
+        logoutButton.addEventListener('click', () => {
+          localStorage.removeItem('user');
+          localStorage.removeItem('token');
+          // Optionnel: afficher un toast de déconnexion
+          // showToast("Vous avez été déconnecté.", "info"); // Si vous avez une fonction showToast
+          window.location.href = 'index.html';
+        });
+      }
+    });
 
     async function genererMenu() {
-      const ingredients = document.getElementById('ingredients').value;
+      const ingredientsInput = document.getElementById('ingredients');
+      const ingredients = ingredientsInput.value.trim(); // .trim() pour enlever les espaces superflus
       const onlyAvailable = document.getElementById('onlyAvailable').checked;
       const resultDiv = document.getElementById('resultat-menu');
+      const genererBtn = document.getElementById('generer-menu-btn'); // Récupérer le bouton
+
+      // Validation simple côté client
+      if (ingredients === "") {
+        resultDiv.innerHTML = '<p style="color: red;">Veuillez entrer au moins un ingrédient.</p>';
+        return;
+      }
 
       resultDiv.innerHTML = "Génération en cours...";
+      if (genererBtn) genererBtn.disabled = true; // Désactiver le bouton
 
       try {
-        const res = await fetch('http://localhost:5000/api/menus/generate', {
+        const res = await fetch('http://localhost:5000/api/menus/generate', { //
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
+            'Authorization': `Bearer ${localStorage.getItem('token')}` //
           },
           body: JSON.stringify({ ingredients, onlyAvailable })
         });
@@ -93,17 +201,24 @@
         const data = await res.json();
 
         if (!res.ok) {
-          resultDiv.innerHTML = `Erreur: ${data.message || 'Une erreur est survenue'}`;
+          resultDiv.innerHTML = `<p style="color: red;">Erreur: ${data.message || 'Une erreur est survenue lors de la génération du menu.'}</p>`; // Message d'erreur plus clair
           return;
         }
 
-        resultDiv.innerHTML = '<h3>Menus suggérés :</h3>' +
-          '<ul>' +
-          data.menus.map(m => `<li>${m}</li>`).join('') +
-          '</ul>';
+        if (data.menus && data.menus.length > 0) {
+          resultDiv.innerHTML = '<h3>Menus suggérés :</h3>' +
+            '<ul>' +
+            data.menus.map(m => `<li>${m}</li>`).join('') + //
+            '</ul>';
+        } else {
+          resultDiv.innerHTML = '<p>Aucun menu n\'a pu être généré avec ces ingrédients. Essayez d\'en ajouter d\'autres !</p>';
+        }
 
       } catch (err) {
-        resultDiv.innerHTML = "Erreur de réseau ou serveur.";
+        console.error("Erreur fetch genererMenu:", err); // Log de l'erreur pour le débogage
+        resultDiv.innerHTML = "<p style=\"color: red;\">Erreur de réseau ou le serveur ne répond pas. Veuillez réessayer plus tard.</p>";
+      } finally {
+        if (genererBtn) genererBtn.disabled = false; // Réactiver le bouton dans tous les cas
       }
     }
   </script>
