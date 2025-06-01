@@ -4,6 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChAIf SES - Tableau de bord Fournisseur</title>
+      <button id="logout-btn">Déconnexion</button>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const logoutBtn = document.getElementById('logout-btn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          localStorage.removeItem('chaif-ses-session-start');
+          window.location.href = 'index.html';
+        });
+      } else {
+        console.error("Bouton de déconnexion introuvable.");
+      }
+    });
+  </script>
+
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="./css/all.min.css">
     <style>
