@@ -770,3 +770,90 @@ tr:hover {
         margin-bottom: 1rem;
     }
 }
+.menu-suggestion-card {
+    background-color: #ffffff; /* Fond blanc pour la carte de suggestion */
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+.menu-suggestion-card h4 {
+    color: #2c3e50; /* Couleur principale du thème */
+    margin-top: 0;
+}
+.menu-suggestion-card h5 {
+    color: #e67300; /* Couleur d'accentuation */
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.05em;
+}
+.menu-suggestion-card ul, .menu-suggestion-card ol {
+    padding-left: 20px; /* Indentation standard pour les listes */
+    margin-bottom: 1rem;
+}
+.menu-suggestion-card ul li, .menu-suggestion-card ol li {
+    margin-bottom: 0.3rem;
+    font-size: 0.9rem;
+    color: #555;
+}
+.menu-suggestion-card p em { /* Style pour la description */
+    color: #555;
+    font-size: 0.95rem;
+}
+.menu-suggestion-card p small {
+    color: #777;
+    font-style: italic;
+}
+
+/* Styles pour la sélection des jours dans le calendrier */
+.calendar-day.selectable-day {
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 2px solid transparent; /* Pour l'effet de sélection */
+}
+.calendar-day.selectable-day:hover {
+    background-color: #f9f9f9;
+    border-color: #e0e0e0;
+}
+.calendar-day.selected-for-planning {
+    background-color: #ffe0b2; /* Orange clair pour sélection */
+    border-color: #e67e22 !important; /* Orange pour la bordure de sélection */
+    box-shadow: 0 0 10px rgba(230, 126, 34, 0.3);
+}
+.calendar-day.selected-for-planning .day-header {
+    background-color: #ffcc80; /* Orange un peu plus foncé pour l'en-tête du jour sélectionné */
+}
+.alert-ingredient-list {
+    list-style: none;
+    padding-left: 0;
+    font-size: 0.9em;
+    max-height: 150px; /* Limiter la hauteur et rendre défilable si besoin */
+    overflow-y: auto;
+}
+.alert-ingredient-list li {
+    padding: 0.25rem 0;
+    border-bottom: 1px dashed #eee;
+}
+.alert-ingredient-list li:last-child {
+    border-bottom: none;
+}
+.alert-ingredient-list .empty-list-placeholder {
+    color: #777;
+    font-style: italic;
+    border-bottom: none;
+}
+.detailed-stock-alerts-grid h3 {
+    font-size: 1.1rem;
+    color: var(--secondary, #e67e22); /* Couleur orange pour les titres de ces listes */
+    margin-bottom: 0.5rem;
+}
+.btn-secondary.btn-small { /* Pour les boutons Gérer/Voir */
+    background-color: #ecf0f1;
+    color: #34495e;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+}
+.btn-secondary.btn-small:hover {
+    background-color: #dde1e2;
+}

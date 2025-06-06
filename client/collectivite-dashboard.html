@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tableau de Bord Collectivités - ChAIf SES</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    /* Styles repris de maison-dashboard.html et adaptés */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Poppins', sans-serif; background-color: #f0f2f5; color: #333; line-height: 1.6; margin: 0; padding: 0; }
+    .page-container { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+    header { background: linear-gradient(135deg, #2c3e50 0%, #16a085 100%); color: #fff; padding: 1.5rem 2rem; border-radius: 12px; margin-bottom: 2.5rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); }
+    header h1 { margin: 0; font-size: 1.8em; font-weight: 600; }
+    header h1 i { margin-right: 10px; }
+    .card { background: #fff; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin-bottom: 2rem; }
+    .card h2 { margin-top: 0; margin-bottom: 1.5rem; color: #2c3e50; font-weight: 600; font-size: 1.4em; display: flex; align-items: center; }
+    .card h2 i { margin-right: 0.75rem; color: #16a085; }
+    label, .label-text { display: block; margin-bottom: 0.6rem; font-weight: 500; color: #495057; font-size: 0.9rem; }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.8rem 1rem; border: 1px solid #ced4da; border-radius: 8px; box-sizing: border-box; font-family: 'Poppins', sans-serif; font-size: 0.95rem; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #16a085; box-shadow: 0 0 0 0.2rem rgba(22, 160, 133, 0.25); outline: none; }
+    .restriction-item { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+    .restriction-item input[type="text"] { flex: 2; }
+    .restriction-item input[type="number"] { flex: 1; }
+    button { background-color: #16a085; color: white; border: none; padding: 0.9rem 1.8rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.95rem; transition: background-color 0.3s ease, transform 0.1s ease; }
+    button:hover { background-color: #117a65; transform: translateY(-2px); }
+    #logout-btn { background-color: #c0392b; font-size: 0.9rem; padding: 0.7rem 1.2rem; }
+    .results { margin-top: 2rem; padding: 1.5rem; background: #f8f9fa; border-radius: 8px; min-height: 100px; }
+    .menu-suggestion-card { background-color: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .menu-suggestion-card h4 { color: #2c3e50; }
+    .menu-suggestion-card h5 { color: #16a085; }
+    .menu-suggestion-card ul, .menu-suggestion-card ol { padding-left: 20px; }
+  </style>
+</head>
+<body>
+
+  <div class="page-container">
+    <header>
+      <h1><i class="fas fa-users"></i> Espace Collectivités</h1>
+      <button id="logout-btn"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
+    </header>
+
+    <div class="card">
+      <h2><i class="fas fa-utensil-spoon"></i> Générateur de Menus pour Collectivités</h2>
+      <form id="collectivite-menu-form">
+        <div class="form-grid">
+          
+          <div class="form-group">
+            <label for="establishment-type-select">Type d'établissement</label>
+            <select id="establishment-type-select" class="form-control">
+              <option value="cantine_scolaire">Cantine Scolaire</option>
+              <option value="maison_de_retraite">Maison de Retraite</option>
+              <option value="cantine_entreprise">Cantine d'Entreprise</option>
+              <option value="hopital">Hôpital</option>
+              <option value="autre">Autre</option>
+            </select>
+          </div>
+
+          <div id="age-range-group" class="form-group">
+            <label for="age-range-select">Tranche d'âge (pour écoles)</label>
+            <select id="age-range-select" class="form-control">
+                <option value="3-5 ans">Maternelle (3-5 ans)</option>
+                <option value="6-10 ans">Primaire (6-10 ans)</option>
+                <option value="11-15 ans">Collège (11-15 ans)</option>
+                <option value="16-18 ans">Lycée (16-18 ans)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="total-servings">Nombre total de personnes</label>
+            <input type="number" id="total-servings" class="form-control" value="50" min="1">
+          </div>
+
+          <div class="form-group">
+            <label for="dishes-to-prepare">Nombre de plats à préparer</label>
+            <input type="number" id="dishes-to-prepare" class="form-control" value="3" min="1" max="5">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 1.5rem;">
+            <label>Besoins alimentaires spécifiques (optionnel)</label>
+            <div id="restrictions-container">
+                <div class="restriction-item">
+                    <input type="text" class="form-control" placeholder="Ex: Végétarien, Sans gluten, Allergie aux arachides...">
+                    <input type="number" class="form-control" min="1" placeholder="Nb. de pers.">
+                    <button type="button" class="remove-restriction-btn" style="background:none; color:#e74c3c; padding:0 5px;">&times;</button>
+                </div>
+            </div>
+            <button type="button" id="add-restriction-btn" style="font-size:0.8em; padding: 5px 10px; margin-top:10px; background-color:#3498db;">+ Ajouter une restriction</button>
+        </div>
+
+        <div class="form-group" style="margin-top: 1.5rem;">
+            <label for="ingredients">Ingrédients à utiliser en priorité (optionnel)</label>
+            <textarea id="ingredients" class="form-control" rows="3" placeholder="Ex: carottes, poulet, stock de pain..."></textarea>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem;">
+            <button type="submit"><i class="fas fa-magic"></i> Générer le Menu</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+        <h2><i class="fas fa-clipboard-list"></i> Suggestions de Menus pour votre Collectivité</h2>
+        <div class="results" id="resultat-menu" aria-live="polite">
+            <p class="placeholder-text">Les suggestions de menus adaptées apparaîtront ici.</p>
+        </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script type="module">
+    // Mettre la logique dans un fichier séparé 'client/js/collectivite-dashboard.js' est recommandé
+    // Mais voici un exemple de la logique directement ici pour commencer
+
+    import { logout, getToken, getCurrentUser } from './js/auth.js';
+    // import { showToast } from './js/utils.js'; // Supposons que showToast soit défini
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Protection de la page
+        const user = getCurrentUser();
+        if (!user || (user.role !== 'collectivite' && user.role !== 'resto' && user.role !== 'admin')) { // Autoriser resto & admin aussi
+            logout();
+            return;
+        }
+
+        // Logique de la page
+        const form = document.getElementById('collectivite-menu-form');
+        const establishmentSelect = document.getElementById('establishment-type-select');
+        const ageGroup = document.getElementById('age-range-group');
+        const restrictionsContainer = document.getElementById('restrictions-container');
+        const addRestrictionBtn = document.getElementById('add-restriction-btn');
+
+        // Pré-remplir le type d'établissement depuis le profil utilisateur
+        if (user.establishmentType && establishmentSelect) {
+            establishmentSelect.value = user.establishmentType;
+        }
+        
+        // Afficher/masquer le champ d'âge
+        function toggleAgeField() {
+            if(establishmentSelect.value === 'cantine_scolaire') {
+                ageGroup.style.display = 'block';
+            } else {
+                ageGroup.style.display = 'none';
+            }
+        }
+        establishmentSelect.addEventListener('change', toggleAgeField);
+        toggleAgeField(); // Appel initial
+
+        // Ajouter une nouvelle ligne de restriction
+        addRestrictionBtn.addEventListener('click', () => {
+            const newRestrictionItem = document.createElement('div');
+            newRestrictionItem.className = 'restriction-item';
+            newRestrictionItem.innerHTML = `
+                <input type="text" class="form-control" placeholder="Ex: Végétarien, Sans gluten...">
+                <input type="number" class="form-control" min="1" placeholder="Nb. de pers.">
+                <button type="button" class="remove-restriction-btn" style="background:none; color:#e74c3c; padding:0 5px;">&times;</button>
+            `;
+            restrictionsContainer.appendChild(newRestrictionItem);
+        });
+
+        // Supprimer une ligne de restriction
+        restrictionsContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-restriction-btn')) {
+                e.target.closest('.restriction-item').remove();
+            }
+        });
+
+        // Soumission du formulaire
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            // Collecter les données
+            const payload = {
+                establishmentType: establishmentSelect.value,
+                ageRange: establishmentSelect.value === 'cantine_scolaire' ? document.getElementById('age-range-select').value : null,
+                totalServings: parseInt(document.getElementById('total-servings').value),
+                dishesToPrepare: parseInt(document.getElementById('dishes-to-prepare').value),
+                priorityIngredients: document.getElementById('ingredients').value,
+                dietaryNeeds: Array.from(restrictionsContainer.querySelectorAll('.restriction-item')).map(item => {
+                    const type = item.querySelector('input[type="text"]').value;
+                    const count = parseInt(item.querySelector('input[type="number"]').value);
+                    return type && count > 0 ? { type, count } : null;
+                }).filter(Boolean) // Filtrer les items nuls
+            };
+            
+            console.log("Payload pour API /generate-collectivite-menu:", payload);
+            // Ici, vous appelleriez la fonction qui fait le fetch vers l'API
+            // generateCollectiviteMenu(payload);
+            alert("Logique d'appel API à connecter. Voir payload dans la console.");
+        });
+
+        // ... (autres écouteurs comme le bouton logout)
+        document.getElementById('logout-btn').addEventListener('click', logout);
+    });
+  </script>
+</body>
+</html>

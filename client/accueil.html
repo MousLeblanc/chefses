@@ -314,31 +314,32 @@
     <div class="container">
         <h1>Tableau de bord</h1>
         
-        <div class="card">
-            <h2>Résumé du Stock</h2>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value" id="total-ingredients">
-                        <div class="loader"></div>
-                    </div>
-                    <div class="stat-label">Ingrédients</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="low-stock-count">
-                        <div class="loader"></div>
-                    </div>
-                    <div class="stat-label">Stock bas</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="expiring-soon-count">
-                        <div class="loader"></div>
-                    </div>
-                    <div class="stat-label">Bientôt périmés</div>
-                </div>
-            </div>
-            <a href="stock.html" class="btn-primary">Gérer le stock</a>
-        </div>
+<div class="card">
+    <h2><i class="fas fa-exclamation-triangle"></i> Alertes de Stock Détaillées</h2>
+    <div class="detailed-stock-alerts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
         
+<div>
+    <h3>Stock Bas (<span id="low-stock-count-detail">0</span>)</h3>
+    <ul id="low-stock-ingredient-list" class="alert-ingredient-list">
+        <li class="empty-list-placeholder">Aucun ingrédient en stock bas.</li>
+    </ul>
+</div>
+
+<div>
+    <h3>Bientôt Périmés (<span id="expiring-soon-count-detail">0</span>)</h3>
+    <ul id="expiring-soon-ingredient-list" class="alert-ingredient-list">
+        <li class="empty-list-placeholder">Aucun ingrédient ne périme bientôt.</li>
+    </ul>
+</div>
+
+<div>
+    <h3>Produits Périmés (<span id="expired-items-count-detail">0</span>)</h3>
+    <ul id="expired-ingredient-list" class="alert-ingredient-list">
+        <li class="empty-list-placeholder">Aucun ingrédient périmé.</li>
+    </ul>
+</div>
+    </div>
+</div>        
         <div class="card">
             <h2>Planning des Menus</h2>
             <div id="upcoming-menus">
@@ -476,6 +477,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     
     <!-- Scripts de l'application -->
+    
+     <script type="module" src="js/common.js"></script> 
      <script type="module" src="js/dashboard.js"></script>
      <script type="module" src="js/auth.js"></script>
      <script type="module" src="js/init.js"></script>
