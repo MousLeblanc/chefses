@@ -20,39 +20,48 @@
 <input type="password" id="password" name="password" required /> 
 
 <label>Votre profil</label><br />
-      <input type="radio" name="role" id="role-maison" value="maison" />
-      <label for="role-maison">Maison</label><br />
-      <input type="radio" name="role" id="role-resto" value="resto" />
-      <label for="role-resto">Resto</label><br />
-      <input type="radio" name="role" id="role-fournisseur" value="fournisseur" />
-      <label for="role-fournisseur">Fournisseur</label><br />
-
+<input type="radio" name="role" id="role-maison" value="maison" />
+<label for="role-maison">Maison</label><br />
+<input type="radio" name="role" id="role-resto" value="resto" />
+<label for="role-resto">Resto</label><br />
+<input type="radio" name="role" id="role-collectivite" value="collectivite" />
+<label for="role-collectivite">Collectivités (home, école, etc.)</label><br />
+<input type="radio" name="role" id="role-fournisseur" value="fournisseur" />
+<label for="role-fournisseur">Fournisseur</label><br />
     
       <div id="businessNameContainer" style="display: none;">
         <label for="businessName">Nom de l'établissement</label> 
         <input type="text" id="businessName" name="businessName" /> 
       </div>
+      <div id="restaurant-type-group" style="display: none;">
+    <label for="restaurant-type">Type d'Établissement</label>
+    <select id="restaurant-type" name="restaurantType" class="form-control">
+        <option value="restaurant_traditionnel">Restaurant Traditionnel</option>
+        <option value="cantine_scolaire">Cantine Scolaire</option>
+        <option value="maison_de_retraite">Cuisine de Maison de Retraite</option>
+        <option value="autre">Autre</option>
+    </select>
+</div>
 
       <button type="submit">S'inscrire</button>
     </form>
 
     <p>Déjà inscrit ? <a href="index.html">Se connecter</a></p>
-  </div>
+<div id="toast-container"></div> <!-- Conteneur pour les notifications -->
 
-  <script src="js/register.js"></script> 
+  <script type="module" src="js/register.js"></script> 
   
   <script>
-    const params = new URLSearchParams(window.location.search);
-    const defaultRole = params.get('role') || 'maison';
-    const roleElement = document.getElementById(`role-${defaultRole}`);
-    if (roleElement) {
-      roleElement.checked = true;
-      // Déclencher un événement 'change' pour que register.js mette à jour la visibilité de businessName
-      roleElement.dispatchEvent(new Event('change', { bubbles: true }));
-    } else {
-      console.error(`Role element with id "role-${defaultRole}" not found.`);
-    }
+    document.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(window.location.search);
+        const defaultRole = params.get('role') || 'maison';
+        const roleElement = document.getElementById(`role-${defaultRole}`);
+        if (roleElement) {
+          roleElement.checked = true;
+          // Déclencher un événement 'change' pour que register.js mette à jour la visibilité
+          roleElement.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    });
   </script>
 </body>
 </html>
-

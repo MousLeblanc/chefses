@@ -4,65 +4,130 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ChAIf SES - Gestion des Stocks</title>
-  <body>
-  <h1>Stock</h1>
-  <button id="logout-btn">Déconnexion</button>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const logoutBtn = document.getElementById('logout-btn');
-      if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          localStorage.removeItem('chaif-ses-session-start');
-          window.location.href = 'index.html';
-        });
-      } else {
-        console.error("Bouton de déconnexion introuvable.");
-      }
-    });
-  </script>
-</body>
-
-
   <style>
-    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; color: #2c3e50; }
-    header { background: #2c3e50; color: #fff; padding: 1.2rem 2rem; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; color: #2c3e50; margin: 0; padding: 0;}
+    header { background: #2c3e50; color: #fff; padding: 1.2rem 2rem; display: flex; justify-content: space-between; align-items: center;}
     .logo { font-size: 1.7rem; font-weight: bold; }
-    nav ul { list-style: none; display: flex; gap: 1.5rem; }
+    nav ul { list-style: none; display: flex; gap: 1.5rem; margin:0; padding:0; }
     nav li a { color: #fff; text-decoration: none; transition: color .2s;}
     nav li a.active, nav li a:hover { color: #e67e22; }
-    .container { max-width: 900px; margin: 2.5rem auto; background: #fff; border-radius: 12px; box-shadow: 0 3px 18px #0001; padding: 2rem; }
-    h1 { margin-bottom: 1.4rem; }
+    .container { max-width: 900px; margin: 2.5rem auto; background: #fff; border-radius: 12px; box-shadow: 0 3px 18px rgba(0,0,0,0.1); padding: 2rem; } /* Correction de #0001 en rgba */
+    h1 { margin-bottom: 1.4rem; color: #2c3e50; }
     .inventory-header { text-align: right; margin-bottom: 1.2rem; }
-    .btn, button { border: none; padding: 10px 18px; border-radius: 5px; cursor: pointer; font-weight: 600;}
+    .btn, button { border: none; padding: 10px 18px; border-radius: 5px; cursor: pointer; font-weight: 600; font-size: 0.95rem;} /* Police de base pour les boutons */
     .btn-primary, .btn-success { background: #e67e22; color: #fff; }
     .btn-primary:hover, .btn-success:hover { background: #cf7712;}
     .stock-table { width: 100%; border-collapse: collapse; margin: 18px 0 8px 0;}
     .stock-table th, .stock-table td { padding: 10px 13px; border-bottom: 1px solid #eee; text-align: left;}
     .stock-table th { background: #f7f7f7; font-size: 1rem;}
     .stock-table tr:hover { background: #fcf4e7;}
-    .btn-icon { background: none; border: none; cursor: pointer; color: #444; font-size: 1.05em; margin: 0 2px;}
+    .btn-icon { background: none; border: none; cursor: pointer; color: #444; font-size: 1.05em; margin: 0 2px; padding: 5px;} /* Ajout padding pour clic facile */
     .btn-icon:hover { color: #e67e22;}
     #empty-stock-message { color: #aaa; text-align:center; padding: 32px 0;}
-    .modal { display: none; position: fixed; z-index: 9999; top:0; left:0; width:100vw; height:100vh; background: rgba(44,62,80,0.15); justify-content: center; align-items: center;}
+    
+    /* Styles pour le Modal */
+    .modal { display: none; position: fixed; z-index: 9999; top:0; left:0; width:100%; height:100%; background: rgba(44,62,80,0.35); justify-content: center; align-items: center;} /* Fond légèrement plus opaque */
     .modal.show { display: flex;}
-    .modal-content { background: #fff; border-radius: 10px; min-width: 320px; box-shadow: 0 6px 22px #0002; padding: 28px 22px;}
-    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;}
-    .modal-title { font-weight: 600; font-size: 1.13rem;}
-    .close-btn { background: none; border: none; font-size: 1.7rem; color: #aaa; cursor: pointer;}
+    .modal-content { 
+      background: #fff; 
+      border-radius: 10px; 
+      min-width: 320px; 
+      max-width: 500px; /* Largeur max pour le contenu du modal */
+      width: 90%;
+      box-shadow: 0 6px 22px rgba(0,0,0,0.2); /* Correction de #0002 en rgba */
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh; /* Hauteur max pour éviter qu'il soit trop long */
+    }
+    .modal-header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      padding: 1rem 1.5rem; /* Padding standardisé */
+      border-bottom: 1px solid #eee;
+      flex-shrink: 0;
+    }
+    .modal-title { font-weight: 600; font-size: 1.2rem; margin:0;} /* Taille de police ajustée */
+    .close-btn { background: none; border: none; font-size: 1.8rem; color: #aaa; cursor: pointer; line-height: 1;} /* Taille et alignement ajustés */
     .close-btn:hover { color: #e67e22;}
-    .form-group { margin-bottom: 1.1rem;}
-    .form-control { width: 100%; padding: 9px 12px; border-radius: 4px; border: 1px solid #ccc;}
-    .form-actions { display: flex; justify-content: flex-end; gap: 1rem;}
-    .autocomplete-list { position: absolute; top:100%; left:0; width:100%; background:white; border:1px solid #ccc; z-index:20; box-shadow: 0 4px 14px #0001; display:none;}
-    .autocomplete-item { padding: 9px 15px; cursor: pointer; font-size: 15px;}
-    .autocomplete-item:hover { background: #eee;}
-    #toast-container { position:fixed; bottom:20px; right:20px; z-index:20000;}
-    .toast { background: #232b38; color:#fff; padding: 13px 22px; border-radius:4px; margin-bottom:6px; opacity:1; transition: opacity 0.3s;}
-    .toast-success { background: #38b87c; }
-    .toast-error { background: #e74c3c; }
+    
+    .modal-body { 
+      padding: 1.5rem; 
+      overflow-y: auto; /* Permet le défilement si le contenu est trop long */
+      flex-grow: 1;
+    }
+    .form-group { margin-bottom: 1.2rem;} /* Espacement légèrement augmenté */
+    .form-control { width: 100%; padding: 10px 12px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box; font-size: 0.95rem;}
+    .form-actions { 
+      display: flex; 
+      justify-content: flex-end; 
+      gap: 0.75rem; /* Espacement entre boutons réduit */
+      padding: 1rem 1.5rem;
+      border-top: 1px solid #eee;
+      background-color: #f9f9f9; /* Fond léger pour distinguer le footer */
+      border-bottom-left-radius: 10px; /* Pour correspondre au modal-content */
+      border-bottom-right-radius: 10px;
+      flex-shrink: 0;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 0.4rem; 
+        font-weight: 500; 
+        color: #495057;
+        font-size: 0.9rem;
+    }
+     .form-group input[type="checkbox"] { 
+        width: auto;
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+    .form-group label span { 
+        vertical-align: middle;
+        font-weight: normal; 
+    }
+    
+    /* Styles pour l'Autocomplétion */
+    .autocomplete-list { 
+      position: absolute; 
+      top:100%;
+      left:0; 
+      right: 0;
+      background:white; 
+      border:1px solid #ccc; 
+      border-top: none; 
+      z-index:10000; 
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08); 
+      display:none; 
+      max-height: 160px; /* Hauteur max avant défilement */
+      overflow-y: auto;
+      border-bottom-left-radius: 4px; /* Esthétique */
+      border-bottom-right-radius: 4px;
+    }
+    .autocomplete-item { padding: 10px 15px; cursor: pointer; font-size: 0.9rem;} /* Font-size ajustée */
+    .autocomplete-item:hover { background: #f0f0f0;} /* Hover plus subtil */
+    
+    /* Styles pour les Toasts (Notifications) */
+    #toast-container { position:fixed; bottom:20px; right:20px; z-index:20000; width: auto; max-width: 350px;} /* Largeur max pour les toasts */
+    .toast { 
+      background: #333; /* Couleur de fond par défaut */
+      color:#fff; 
+      padding: 12px 18px; /* Padding ajusté */
+      border-radius:6px; /* Coins plus arrondis */
+      margin-bottom:10px; /* Espacement entre toasts */
+      opacity:0; 
+      transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out; 
+      display: flex; 
+      align-items: center; 
+      transform: translateX(100%); /* Animation d'arrivée depuis la droite */
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      font-size: 0.9rem;
+    }
+    .toast.show { opacity:1; transform: translateX(0); }
+    .toast-success { background: #2ecc71; border-left: 5px solid #27ae60;}
+    .toast-error { background: #e74c3c; border-left: 5px solid #c0392b;}
+    .toast-warning { background: #f39c12; border-left: 5px solid #d35400; color: #fff;} /* Couleur texte pour warning */
+    .toast-info { background: #3498db; border-left: 5px solid #2980b9;}
+    .toast-icon { margin-right: 10px; font-size: 1.3em; } /* Icône légèrement plus grande */
   </style>
 </head>
 <body>
@@ -76,7 +141,7 @@
         <li><a href="planning.html">Planning</a></li>
         <li><a href="suppliers.html">Fournisseurs</a></li>
         <li><a href="settings.html">Paramètres</a></li>
-        <li><a href="#" id="logout-btn">Déconnexion</a></li>
+        <li><a href="#" id="logout-btn-nav">Déconnexion</a></li> 
       </ul>
     </nav>
   </header>
@@ -92,47 +157,51 @@
           <th>Catégorie</th>
           <th>Quantité</th>
           <th>Unité</th>
+          <th>Seuil Alerte</th>
           <th>Date d'expiration</th>
           <th>Actions</th>
         </tr>
       </thead>
-      <tbody id="ingredient-list"></tbody>
+      <tbody id="ingredient-list">
+        </tbody>
     </table>
     <div id="empty-stock-message" style="display:none;">
-      Aucun ingrédient enregistré.
+      Aucun ingrédient enregistré. Cliquez sur "+ Ajouter un ingrédient" pour commencer.
     </div>
   </div>
 
-  <!-- Modal d'ajout/modification -->
   <div id="item-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <span class="modal-title" id="modal-title">Ajouter un ingrédient</span>
+        <h2 class="modal-title" id="modal-title">Ajouter un ingrédient</h2> 
         <button class="close-btn" id="close-modal-btn">&times;</button>
       </div>
       <div class="modal-body">
         <form id="item-form" autocomplete="off">
           <input type="hidden" id="item-id" />
           <div class="form-group" style="position:relative;">
-            <label for="item-name">Nom *</label>
+            <label for="item-name">Nom de l'ingrédient *</label>
             <input type="text" id="item-name" class="form-control" required autocomplete="off">
             <div class="autocomplete-list" id="modal-autocomplete"></div>
           </div>
           <div class="form-group">
             <label for="item-category">Catégorie *</label>
             <select id="item-category" class="form-control" required>
-              <option value="">Sélectionnez une catégorie</option>
-              <option value="Viandes et Poissons">Viandes et Poissons</option>
-              <option value="Légumes">Légumes</option>
+              <option value="">Sélectionnez une catégorie...</option>
               <option value="Fruits">Fruits</option>
+              <option value="Légumes">Légumes</option>
+              <option value="Viandes et Poissons">Viandes et Poissons</option>
               <option value="Produits Laitiers">Produits Laitiers</option>
               <option value="Céréales et Féculents">Céréales et Féculents</option>
               <option value="Épices et Condiments">Épices et Condiments</option>
+              <option value="Épicerie et Condiments">Épicerie et Condiments</option>
+              <option value="Boissons">Boissons</option>
+              <option value="Autres">Autres</option>
             </select>
           </div>
           <div class="form-group">
             <label for="item-quantity">Quantité *</label>
-            <input type="number" id="item-quantity" class="form-control" min="0" step="0.01" required>
+            <input type="number" id="item-quantity" class="form-control" min="0" step="any" required> 
           </div>
           <div class="form-group">
             <label for="item-unit">Unité *</label>
@@ -143,177 +212,40 @@
               <option value="ml">ml</option>
               <option value="unité">unité</option>
               <option value="botte">botte</option>
+              <option value="boite">boîte</option>
+              <option value="conserve">conserve</option>
+              <option value="sachet">sachet</option>
+              <option value="bouteille">bouteille</option>
             </select>
+          </div>
+           <div class="form-group">
+            <label for="item-threshold">Seuil d'alerte (quantité minimale)</label>
+            <input type="number" id="item-threshold" class="form-control" min="0" step="any" placeholder="Ex: 5 (optionnel)">
+          </div>
+          <div class="form-group">
+            <label for="item-alert-active">
+                <input type="checkbox" id="item-alert-active">
+                <span>Activer l'alerte de stock bas</span>
+            </label>
           </div>
           <div class="form-group">
             <label for="item-expiry">Date d'expiration</label>
             <input type="date" id="item-expiry" class="form-control">
           </div>
-          <div class="form-actions">
-            <button type="button" class="btn-primary" id="cancel-item-btn">Annuler</button>
-            <button type="submit" class="btn-success">Enregistrer</button>
-          </div>
         </form>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-primary" id="cancel-item-btn" style="background-color: #7f8c8d;">Annuler</button> 
+        <button type="submit" form="item-form" class="btn-success">Enregistrer</button>
       </div>
     </div>
   </div>
-  <div id="toast-container"></div>
-  <script>
-    // Liste exhaustive (complète selon tes besoins, raccourcie ici pour lisibilité)
-    const INGREDIENTS_LIST = [
-      "Ail","Artichaut","Asperge","Aubergine","Avocat","Carotte","Céleri","Champignon","Chou","Chou-fleur","Concombre",
-      "Courgette","Échalote","Endive","Épinard","Fenouil","Haricot vert","Laitue","Maïs","Navet","Oignon",
-      "Petit pois","Poireau","Poivron","Pomme de terre","Potiron","Radis","Salade","Tomate",
-      "Abricot","Ananas","Banane","Cerise","Clémentine","Fraise","Framboise","Grenade","Kiwi","Litchi","Mangue","Melon","Mirabelle","Mûre","Myrtille","Nectarine","Orange","Pamplemousse","Pastèque","Pêche","Poire","Pomme","Prune","Raisin",
-      "Poulet","Boeuf","Saumon","Cabillaud","Dorade","Crevette","Dinde","Jambon","Lait","Yaourt","Fromage","Beurre","Crème fraîche",
-      "Farine","Riz","Pâtes","Pain","Couscous","Semoule","Quinoa","Sel","Poivre","Curry","Thym","Basilic","Persil",
-      "Huile d'olive","Vinaigre","Citron","Orange","Noix","Chocolat","Café","Thé","Vin blanc","Vin rouge"
-      // ...etc complète si tu veux
-    ];
 
-    // LocalStorage DB helpers
-    function loadStock() { return JSON.parse(localStorage.getItem('stock') || "[]"); }
-    function saveStock(arr) { localStorage.setItem('stock', JSON.stringify(arr)); }
+  <div id="toast-container"></div> 
 
-    // Rafraîchir tableau d'inventaire
-    function refreshTable() {
-      const data = loadStock();
-      const tbody = document.getElementById('ingredient-list');
-      tbody.innerHTML = "";
-      if (!data.length) {
-        document.getElementById('empty-stock-message').style.display = "block";
-        return;
-      } else {
-        document.getElementById('empty-stock-message').style.display = "none";
-      }
-      data.forEach(ing => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${ing.nom}</td>
-          <td>${ing.categorie}</td>
-          <td>${ing.qte}</td>
-          <td>${ing.unite}</td>
-          <td>${ing.expiry || ""}</td>
-          <td>
-            <button class="btn-icon" .onmousedown="editItem('${ing.id}')">✏️</button>
-            <button class="btn-icon" .onmousedown="deleteItem('${ing.id}')">🗑️</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    // Ajout/édition
-    document.getElementById('add-item-btn').onmousedown = () => {
-      openModal();
-    };
-    document.getElementById('cancel-item-btn').onmousedown = closeModal;
-    document.getElementById('close-modal-btn').onmousedown = closeModal;
-    function openModal(editId = null) {
-      document.getElementById('item-form').reset();
-      document.getElementById('item-id').value = "";
-      document.getElementById('modal-title').textContent = editId ? "Modifier un ingrédient" : "Ajouter un ingrédient";
-      document.getElementById('item-modal').classList.add('show');
-      if (editId) {
-        const stock = loadStock();
-        const item = stock.find(x => x.id === editId);
-        if (item) {
-          document.getElementById('item-id').value = item.id;
-          document.getElementById('item-name').value = item.nom;
-          document.getElementById('item-category').value = item.categorie;
-          document.getElementById('item-quantity').value = item.qte;
-          document.getElementById('item-unit').value = item.unite;
-          document.getElementById('item-expiry').value = item.expiry || "";
-        }
-      }
-      setTimeout(initModalAutocomplete, 100);
-    }
-    function closeModal() {
-      document.getElementById('item-modal').classList.remove('show');
-    }
-
-    document.getElementById('item-form').onsubmit = function(e) {
-      e.preventDefault();
-      const id = document.getElementById('item-id').value || Date.now().toString();
-      const nom = document.getElementById('item-name').value.trim();
-      const categorie = document.getElementById('item-category').value;
-      const qte = document.getElementById('item-quantity').value;
-      const unite = document.getElementById('item-unit').value;
-      const expiry = document.getElementById('item-expiry').value;
-      let stock = loadStock();
-      const idx = stock.findIndex(x => x.id === id);
-      const obj = { id, nom, categorie, qte, unite, expiry };
-      if (idx >= 0) stock[idx] = obj;
-      else stock.push(obj);
-      saveStock(stock);
-      closeModal();
-      showToast("Ingrédient enregistré !", "success");
-      refreshTable();
-    };
-    window.editItem = openModal;
-    window.deleteItem = id => {
-      let stock = loadStock().filter(x => x.id !== id);
-      saveStock(stock);
-      showToast("Supprimé !", "success");
-      refreshTable();
-    };
-
-    // Autocomplétion champ modale
-    function initModalAutocomplete() {
-      const input = document.getElementById('item-name');
-      const container = document.getElementById('modal-autocomplete');
-      if (!input || !container) return;
-      input.oninput = function () {
-        const val = this.value.toLowerCase().trim();
-        container.innerHTML = '';
-        if (!val) { container.style.display = 'none'; return; }
-        const found = INGREDIENTS_LIST.filter(ing => ing.toLowerCase().startsWith(val));
-        found.slice(0, 12).forEach(ing => {
-          const div = document.createElement('div');
-          div.className = 'autocomplete-item';
-          div.textContent = ing;
-          div.onmousedown = function () {
-            
-            input.value = ing;
-            container.innerHTML = '';
-            container.style.display = 'none';
-          };
-          container.appendChild(div);
-        });
-        container.style.display = found.length ? 'block' : 'none';
-      };
-      input.onblur = function () { setTimeout(() => { container.style.display = 'none'; }, 150); };
-    }
-
-    // Toast simple
-    function showToast(msg, type = "success") {
-      let container = document.getElementById('toast-container');
-      if (!container) return;
-      const toast = document.createElement('div');
-      toast.className = `toast toast-${type}`;
-      toast.innerHTML = `<span>${msg}</span>`;
-      container.appendChild(toast);
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        setTimeout(() => toast.remove(), 300);
-      }, 2200);
-    }
-
-    // Init page
-  </script>
-  <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        localStorage.removeItem('chaif-ses-session-start');
-        window.location.href = 'index.html';
-      });
-    }
-  });
-</script>
-
+  <script type="module" src="js/auth.js"></script>
+  <script type="module" src="js/apiHelper.js"></script> 
+  <script type="module" src="js/utils.js"></script>   
+  <script type="module" src="js/stock.js"></script>    
 </body>
 </html>
