@@ -1,3 +1,16 @@
-node_modules
-.env
-.env - Copie.env
+# Fichiers sensibles
+.env*
+*.key
+*.pem
+
+# MongoDB
+mongodb-data/
+
+# Node.js
+node_modules/
+logs/
+*.log
+
+# Système
+.DS_Store
+Thumbs.db
